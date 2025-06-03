@@ -1,0 +1,703 @@
+// קובץ JavaScript לפאנל הניהול - הום-לנד נכסים
+
+document.addEventListener('DOMContentLoaded', function() {
+    // סימולציה של מידע משתמשים - במערכת אמיתית זה יהיה בשרת (נשאר לצורך תאימות)
+    const users = [
+        { username: "admin", password: "MoishiAdmin2025", name: "מנהל המערכת" },
+        { username: "eli", password: "Eli1234", name: "אלי בלוך" },
+        { username: "yechiel", password: "Yechiel1234", name: "יחיאל דויטש" },
+        { username: "moshe", password: "Moshe1234", name: "משה בלוך" }
+    ];
+
+    // בדיקת התחברות (עובד עם check-auth.js)
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+
+    // לוגיקת הלוגין
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // בדיקת פרטי התחברות
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // התחברות הצליחה
+                
+                // שמירת מידע התחברות בסשן
+                sessionStorage.setItem('loggedInUser', JSON.stringify({
+                    username: user.username,
+                    name: user.name
+                }));
+                
+                // העברה לדף הניהול
+                window.location.href = './index.html';
+            } else {
+                // התחברות נכשלה
+                loginMessage.textContent = 'שם משתמש או סיסמה שגויים';
+                loginMessage.classList.add('error');
+                loginMessage.style.display = 'block';
+            }
+        });
+    }
+
+    
+    // בדיקה אם המשתמש כבר מחובר
+    const checkLoggedIn = () => {
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        if (loggedInUser) {
+            const user = JSON.parse(loggedInUser);
+            loginContainer.style.display = 'none';
+            adminPanel.style.display = 'flex';
+            currentAgent.textContent = `שלום, ${user.name}`;
+            loadProperties();
+        }
+    };
+    
+    checkLoggedIn();
+    
+    // ניהול תפריט
+    const menuItems = document.querySelectorAll('.admin-menu li');
+    const adminSections = document.querySelectorAll('.admin-section');
+    const adminTitle = document.querySelector('.admin-title h1');
+    
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // הסרת קלאס פעיל מכל הפריטים
+            menuItems.forEach(i => i.classList.remove('active'));
+            // הוספת קלאס פעיל לפריט הנבחר
+            this.classList.add('active');
+            
+            // הצגת האזור המתאים
+            const section = this.getAttribute('data-section');
+            adminSections.forEach(s => s.classList.remove('active'));
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // עדכון הכותרת
+            adminTitle.textContent = this.textContent.trim().replace(/^\S+\s+/, '');
+        });
+    });
+    
+    // התנתקות
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            sessionStorage.removeItem('loggedInUser');
+            adminPanel.style.display = 'none';
+            loginContainer.style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            loginMessage.textContent = '';
+        });
+    }
+    
+    // משתנים גלובליים לשמירת נתונים
+    let propertiesData = [];
+    let agentsData = [];
+
+    // פונקציה למילוי טופס נכס לעריכה
+    function fillPropertyForm(property) {
+        // טופס הנכס
+        const form = document.getElementById('addPropertyForm');
+        if (!form) return false;
+        
+        // הוספת שדה נסתר למזהה הנכס הנערך
+        let propertyIdField = form.querySelector('input[name="propertyId"]');
+        if (!propertyIdField) {
+            propertyIdField = document.createElement('input');
+            propertyIdField.type = 'hidden';
+            propertyIdField.name = 'propertyId';
+            form.appendChild(propertyIdField);
+        }
+        propertyIdField.value = property.id;
+        
+        // מילוי שאר שדות הטופס
+        form.querySelector('input[name="title"]').value = property.title || '';
+        form.querySelector('input[name="address"]').value = property.address || '';
+        form.querySelector('textarea[name="description"]').value = property.description || '';
+        form.querySelector('input[name="price"]').value = property.price || '';
+        form.querySelector('select[name="type"]').value = property.type || '';
+        form.querySelector('input[name="rooms"]').value = property.rooms || '';
+        form.querySelector('input[name="area"]').value = property.area || '';
+        form.querySelector('input[name="floor"]').value = property.floor || '';
+        form.querySelector('input[name="neighborhood"]').value = property.neighborhood || '';
+        form.querySelector('select[name="status"]').value = property.status || '';
+        
+        // אם יש מאפיינים, נסמן אותם
+        const features = property.features || [];
+        document.querySelectorAll('input[name="features[]"]').forEach(checkbox => {
+            checkbox.checked = features.includes(checkbox.value);
+        });
+        
+        // מילוי קומבו הסוכן
+        if (property.agentId) {
+            form.querySelector('select[name="agentId"]').value = property.agentId;
+        }
+        
+        // תצוגה מקדימה של תמונות קיימות אם יש
+        const mainImagePreview = document.getElementById('main-image-preview');
+        const additionalImagesPreview = document.getElementById('additional-images-preview');
+        
+        // תמונה ראשית
+        if (property.images && property.images.length > 0 && mainImagePreview) {
+            mainImagePreview.innerHTML = `<img src="${property.images[0]}" alt="תמונה ראשית" class="preview-img">`;
+            
+            // שאר התמונות
+            if (property.images.length > 1 && additionalImagesPreview) {
+                additionalImagesPreview.innerHTML = '';
+                for (let i = 1; i < property.images.length; i++) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'preview-item';
+                    imageDiv.innerHTML = `<img src="${property.images[i]}" alt="תמונה נוספת ${i}" class="preview-img">`;
+                    additionalImagesPreview.appendChild(imageDiv);
+                }
+            }
+        }
+        
+        // שינוי כפתור השליחה לעדכון
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.textContent = 'עדכן נכס';
+        }
+        
+        // שינוי הכותרת
+        const formTitle = document.querySelector('.add-property-form h2');
+        if (formTitle) {
+            formTitle.textContent = 'עריכת נכס';
+        }
+        
+        return true;
+    }
+    
+    // טיפול בהעלאת תמונות לנכסים
+    function setupImageUploadPreview() {
+        // טיפול בתמונה ראשית
+        const mainImageInput = document.getElementById('property-main-image');
+        const mainImagePreview = document.getElementById('main-image-preview');
+        
+        if (mainImageInput && mainImagePreview) {
+            mainImageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        mainImagePreview.innerHTML = `<img src="${e.target.result}" alt="תמונה ראשית" class="preview-img">`;
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // טיפול בתמונות נוספות
+        const additionalImagesInput = document.getElementById('property-additional-images');
+        const additionalImagesPreview = document.getElementById('additional-images-preview');
+        
+        if (additionalImagesInput && additionalImagesPreview) {
+            additionalImagesInput.addEventListener('change', function() {
+                additionalImagesPreview.innerHTML = '';
+                
+                if (this.files && this.files.length > 0) {
+                    for (let i = 0; i < this.files.length; i++) {
+                        const reader = new FileReader();
+                        const imageDiv = document.createElement('div');
+                        imageDiv.className = 'preview-item';
+                        additionalImagesPreview.appendChild(imageDiv);
+                        
+                        reader.onload = (function(div) {
+                            return function(e) {
+                                div.innerHTML = `<img src="${e.target.result}" alt="תמונה נוספת" class="preview-img">`;
+                            };
+                        })(imageDiv);
+                        
+                        reader.readAsDataURL(this.files[i]);
+                    }
+                }
+            });
+        }
+    }
+    
+    // טיפול בטופס הוספת נכסים
+    const addPropertyForm = document.getElementById('addPropertyForm');
+    if (addPropertyForm) {
+        addPropertyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // יצירת אובייקט FormData לשליחת הטופס כולל תמונות
+            const formData = new FormData(this);
+            
+            // מאפיינים שנבחרו
+            const selectedFeatures = [];
+            document.querySelectorAll('input[name="features[]"]:checked').forEach(checkbox => {
+                selectedFeatures.push(checkbox.value);
+            });
+            
+            // הוספת המאפיינים כמערך JSON
+            formData.delete('features[]');
+            formData.append('features', JSON.stringify(selectedFeatures));
+            
+            // בדיקה אם זה הוספת נכס חדש או עדכון נכס קיים
+            const propertyId = formData.get('propertyId');
+            const isUpdate = propertyId && propertyId.trim() !== '';
+            
+            // קביעת הכתובת והמתודה לפי סוג הפעולה
+            const url = isUpdate ? `/api/properties/${propertyId}` : '/api/properties';
+            const method = isUpdate ? 'PUT' : 'POST';
+            
+            console.log(`שולח ${method} לכתובת ${url} | ID: ${propertyId || 'חדש'}`);
+            
+            // שליחת הנתונים לשרת
+            fetch(url, {
+                method: method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // מציג הודעה מתאימה לפי סוג הפעולה
+                    const successMessage = isUpdate ? 'הנכס עודכן בהצלחה!' : 'הנכס נוסף בהצלחה!';
+                    alert(successMessage);
+                    
+                    // איפוס הטופס ושינוי הכותרת חזרה ל"הוספת נכס"
+                    addPropertyForm.reset();
+                    const formTitle = document.querySelector('.add-property-form h2');
+                    if (formTitle) formTitle.textContent = 'הוספת נכס';
+                    
+                    const submitBtn = addPropertyForm.querySelector('button[type="submit"]');
+                    if (submitBtn) submitBtn.textContent = 'הוסף נכס';
+                    
+                    // ניקוי תמונות
+                    const mainImagePreview = document.getElementById('main-image-preview');
+                    const additionalImagesPreview = document.getElementById('additional-images-preview');
+                    if (mainImagePreview) mainImagePreview.innerHTML = '';
+                    if (additionalImagesPreview) additionalImagesPreview.innerHTML = '';
+                    
+                    // מעבר לדף ניהול נכסים ורענון הרשימה
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    document.querySelector('[data-section="properties"]').classList.add('active');
+                    
+                    adminSections.forEach(s => s.classList.remove('active'));
+                    document.getElementById('properties-section').classList.add('active');
+                    
+                    adminTitle.textContent = 'ניהול נכסים';
+                    
+                    // טעינה מחדש של הנכסים
+                    loadProperties();
+                } else {
+                    const errorPrefix = isUpdate ? 'שגיאה בעדכון הנכס' : 'שגיאה בהוספת הנכס';
+                    alert(`${errorPrefix}: ${data.error || 'אירעה שגיאה לא ידועה'}`);
+                }
+            })
+            .catch(error => {
+                console.error('שגיאה בשליחת הנכס:', error);
+                const errorPrefix = isUpdate ? 'שגיאה בעדכון הנכס' : 'שגיאה בהוספת הנכס';
+                alert(`${errorPrefix}. אנא נסה שוב מאוחר יותר.`);
+            });
+        });
+    }
+    
+    // פונקציית אתחול הממשק
+    function initAdmin() {
+        // הצגת שם המשתמש המחובר
+        const userInfo = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (userInfo && userInfo.name) {
+            const userNameElement = document.getElementById('userNameDisplay');
+            if (userNameElement) {
+                userNameElement.textContent = userInfo.name;
+            }
+        }
+        
+        // טעינת נתונים מהשרת
+        loadDashboard();
+        loadProperties();
+        loadAgents();
+        
+        // התחלת ניווט בין הסקציות
+        setupNavigation();
+        
+        // הגדרת אירועים לכפתורים
+        setupButtons();
+        
+        // הגדרת פעולת התנתקות
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = './login.html';
+            });
+        }
+    }
+    
+    // טעינת נתונים עבור לוח הבקרה
+    function loadDashboard() {
+        // טעינת סיכומים ללוח המחוונים
+        Promise.all([fetch('/api/properties'), fetch('/api/agents')])
+            .then(responses => {
+                if (!responses.every(response => response.ok)) {
+                    throw new Error('שגיאה בטעינת נתונים');
+                }
+                return Promise.all(responses.map(response => response.json()));
+            })
+            .then(([properties, agents]) => {
+                // עדכון ספירות מהירות
+                document.getElementById('totalProperties').textContent = properties.length;
+                document.getElementById('totalAgents').textContent = agents.length;
+                
+                // ספירת נכסים פעילים
+                const activeProperties = properties.filter(p => p.status === 'פעיל').length;
+                document.getElementById('activeProperties').textContent = activeProperties;
+                
+                // ספירת נכסים שנמכרו
+                const soldProperties = properties.filter(p => p.status === 'נמכר').length;
+                document.getElementById('soldProperties').textContent = soldProperties;
+            })
+            .catch(error => {
+                console.error('שגיאה בטעינת נתונים ללוח המחוונים:', error);
+            });
+    }
+    
+    // טעינת נכסים מהשרת לטבלת הנכסים
+    function loadProperties() {
+        const propertiesTableBody = document.getElementById('propertiesTableBody');
+        if (!propertiesTableBody) return;
+
+        // איפוס הטבלה והצגת מצב טעינה
+        propertiesTableBody.innerHTML = '<tr><td colspan="8" class="loading-row"><div class="loading-spinner"></div> טוען נכסים...</td></tr>';
+
+        // שליפת נתוני נכסים מהשרת
+        fetch('/api/properties')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('שגיאה בטעינת נכסים');
+                }
+                return response.json();
+            })
+            .then(properties => {
+                if (properties && properties.length > 0) {
+                    // ניקוי הטבלה
+                    propertiesTableBody.innerHTML = '';
+                    
+                    // הוספת שורות לטבלה
+                    properties.forEach(property => {
+                        let statusClass = 'status-active';
+                        if (property.status === 'נמכר') {
+                            statusClass = 'status-sold';
+                        } else if (property.status === 'טיוטה') {
+                            statusClass = 'status-draft';
+                        }
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><img src="${property.image || '../images/placeholder.jpg'}" alt="${property.title}" class="property-thumbnail"></td>
+                            <td>${property.title}</td>
+                            <td>${property.type || 'לא צוין'}</td>
+                            <td>${property.price}</td>
+                            <td>${property.date || new Date().toLocaleDateString()}</td>
+                            <td><span class="status-badge ${statusClass}">${property.status || 'פעיל'}</span></td>
+                            <td class="table-actions">
+                                <button class="action-btn edit-btn" data-id="${property.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete-btn" data-id="${property.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        `;
+                        
+                        propertiesTableBody.appendChild(row);
+                    });
+                    
+                    // הוספת אירועי לחיצה לכפתורי עריכה ומחיקה
+                    addPropertyEventListeners();
+                } else {
+                    // אין נכסים
+                    propertiesTableBody.innerHTML = '<tr><td colspan="8" class="empty-row">לא נמצאו נכסים</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('שגיאה בטעינת נכסים:', error);
+                propertiesTableBody.innerHTML = `<tr><td colspan="8" class="error-row">שגיאה בטעינת נכסים: ${error.message}</td></tr>`;
+            });
+        });
+
+        // הוספת המאפיינים כמערך JSON
+        formData.delete('features[]');
+        formData.append('features', JSON.stringify(selectedFeatures));
+
+        // שליחת הנתונים לשרת
+        fetch('/api/properties', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('הנכס נוסף בהצלחה!');
+                addPropertyForm.reset();
+
+                // מעבר לדף ניהול נכסים ורענון הרשימה
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector('[data-section="properties"]').classList.add('active');
+
+                adminSections.forEach(s => s.classList.remove('active'));
+                document.getElementById('properties-section').classList.add('active');
+
+                adminTitle.textContent = 'ניהול נכסים';
+
+                // טעינה מחדש של הנכסים
+                loadProperties();
+            } else {
+                alert(`שגיאה בהוספת הנכס: ${data.error || 'אירעה שגיאה לא ידועה'}`);
+            }
+        })
+        .catch(error => {
+            console.error('שגיאה בשליחת הנכס:', error);
+            alert('אירעה שגיאה בהוספת הנכס. אנא נסה שוב מאוחר יותר.');
+                    // שליחת בקשת מחיקה לשרת
+                    fetch(`/api/properties/${propertyId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('הנכס נמחק בהצלחה');
+                            this.closest('tr').remove();
+                        } else {
+                            alert(`שגיאה במחיקת הנכס: ${data.error || 'אירעה שגיאה לא מוגדרת'}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('שגיאה במחיקת הנכס:', error);
+                        alert('אירעה שגיאה במחיקת הנכס, נסה שנית מאוחר יותר');
+                    });
+                }
+            });
+        });
+    }
+    
+
+    
+    // הוספת אירועים לכפתורים
+    function setupButtons() {
+        // כפתור הוספת נכס חדש
+        const addPropertyBtn = document.getElementById('addPropertyBtn');
+        if (addPropertyBtn) {
+            addPropertyBtn.addEventListener('click', function() {
+                // מעבר לאזור הוספת נכס
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector('[data-section="add-property"]').classList.add('active');
+                
+                adminSections.forEach(s => s.classList.remove('active'));
+                document.getElementById('add-property-section').classList.add('active');
+                
+                adminTitle.textContent = 'הוספת נכס';
+                
+                // איפוס הטופס אם נשאר במצב עריכה
+                const form = document.getElementById('addPropertyForm');
+                if (form) {
+                    form.reset();
+                    
+                    // איפוס הכותרת וכפתור השליחה
+                    const formTitle = document.querySelector('.add-property-form h2');
+                    if (formTitle) formTitle.textContent = 'הוספת נכס';
+                    
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) submitBtn.textContent = 'הוסף נכס';
+                    
+                    // ניקוי השדה הנסתר של מזהה הנכס
+                    let propertyIdField = form.querySelector('input[name="propertyId"]');
+                    if (propertyIdField) propertyIdField.value = '';
+                    
+                    // ניקוי תמונות מוצגות
+                    const mainImagePreview = document.getElementById('main-image-preview');
+                    const additionalImagesPreview = document.getElementById('additional-images-preview');
+                    if (mainImagePreview) mainImagePreview.innerHTML = '';
+                    if (additionalImagesPreview) additionalImagesPreview.innerHTML = '';
+                }
+            });
+        }
+    }
+    
+    // הגדרת ניווט בין הסקציות השונות
+    function setupNavigation() {
+        // הוספת מאזין לכל פריטי התפריט
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-section');
+                
+                // הסרת פעילות מכל פריטי התפריט
+                menuItems.forEach(i => i.classList.remove('active'));
+                
+                // הוספת פעילות לפריט הנוכחי
+                this.classList.add('active');
+                
+                // הסתרת כל הסקציות
+                adminSections.forEach(s => s.classList.remove('active'));
+                
+                // הצגת הסקציה הנבחרת
+                const currentSection = document.getElementById(sectionId + '-section');
+                if (currentSection) {
+                    currentSection.classList.add('active');
+                    
+                    // עדכון כותרת העמוד
+                    switch(sectionId) {
+                        case 'dashboard':
+                            adminTitle.textContent = 'לוח בקרה';
+                            break;
+                        case 'properties':
+                            adminTitle.textContent = 'ניהול נכסים';
+                            break;
+                        case 'agents':
+                            adminTitle.textContent = 'ניהול סוכנים';
+                            break;
+                        case 'add-property':
+                            adminTitle.textContent = 'הוספת נכס';
+                            break;
+                        case 'add-agent':
+                            adminTitle.textContent = 'הוספת סוכן';
+                            break;
+                        default:
+                            adminTitle.textContent = 'פאנל ניהול';
+                    }
+                }
+            });
+        });
+    }
+    
+    // הוספת אירועי לחיצה לכפתורי נכסים
+    function addPropertyEventListeners() {
+        // אירועי לחיצה לכפתורי עריכה
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const propertyId = this.getAttribute('data-id');
+                console.log(`פתיחת עריכה לנכס ${propertyId}`);
+                
+                // מעבר לאזור עריכת נכס
+                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelector('[data-section="add-property"]').classList.add('active');
+                
+                adminSections.forEach(s => s.classList.remove('active'));
+                document.getElementById('add-property-section').classList.add('active');
+                
+                adminTitle.textContent = 'עריכת נכס';
+                
+                // מציאת הנכס לעריכה
+                const property = propertiesData.find(p => String(p.id) === String(propertyId));
+                
+                if (property) {
+                    // מילוי הטופס עם נתוני הנכס
+                    fillPropertyForm(property);
+                } else {
+                    alert('לא נמצאו נתונים עבור נכס זה.');
+                }
+            });
+        });
+        
+        // אירועי לחיצה לכפתורי מחיקה
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const propertyId = this.getAttribute('data-id');
+                if (confirm(`האם אתה בטוח שברצונך למחוק את הנכס מספר ${propertyId}?`)) {
+                    // שליחת בקשת מחיקה לשרת
+                    fetch(`/api/properties/${propertyId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('הנכס נמחק בהצלחה');
+                            this.closest('tr').remove();
+                        } else {
+                            alert(`שגיאה במחיקת הנכס: ${data.error || 'אירעה שגיאה לא מוגדרת'}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('שגיאה במחיקת הנכס:', error);
+                        alert('אירעה שגיאה במחיקת הנכס, נסה שנית מאוחר יותר');
+                    });
+                }
+            });
+        });
+    }
+    
+    // טעינת סוכנים מהשרת לטבלת הסוכנים
+    function loadAgents() {
+        const agentsTableBody = document.getElementById('agentsTableBody');
+        if (!agentsTableBody) return;
+
+        // איפוס הטבלה והצגת מצב טעינה
+        agentsTableBody.innerHTML = '<tr><td colspan="6" class="loading-row"><div class="loading-spinner"></div> טוען סוכנים...</td></tr>';
+
+        // שליפת נתוני סוכנים מהשרת
+        fetch('/api/agents')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('שגיאה בטעינת סוכנים');
+                }
+                return response.json();
+            })
+            .then(agents => {
+                // שמירת המידע במשתנה הגלובלי
+                agentsData = agents;
+                
+                if (agents && agents.length > 0) {
+                    // ניקוי הטבלה
+                    agentsTableBody.innerHTML = '';
+                    
+                    // הוספת שורות לטבלה
+                    agents.forEach(agent => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><img src="${agent.image || '../images/agents/placeholder.jpg'}" alt="${agent.name}" class="agent-thumbnail"></td>
+                            <td>${agent.name}</td>
+                            <td>${agent.phone || 'לא צוין'}</td>
+                            <td>${agent.email || 'לא צוין'}</td>
+                            <td class="table-actions">
+                                <button class="action-btn edit-agent-btn" data-id="${agent.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete-agent-btn" data-id="${agent.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        `;
+                        
+                        agentsTableBody.appendChild(row);
+                    });
+                    
+                    // הוספת אירועי לחיצה לכפתורי עריכה ומחיקה
+                    addAgentEventListeners();
+                } else {
+                    // אין סוכנים
+                    agentsTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">לא נמצאו סוכנים</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('שגיאה בטעינת סוכנים:', error);
+                agentsTableBody.innerHTML = `<tr><td colspan="6" class="error-row">שגיאה בטעינת סוכנים: ${error.message}</td></tr>`;
+            });
+    }
+    
+    // הוספת אירועי לחיצה לכפתורי סוכנים
+    function addAgentEventListeners() {
+        document.querySelectorAll('.edit-agent-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const agentId = this.getAttribute('data-id');
+                alert(`עריכת סוכן מספר ${agentId}`);
+                // כאן תהיה פתיחת טופס עריכה עם נתוני הסוכן
+            });
+        });
+        
+        document.querySelectorAll('.delete-agent-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const agentId = this.getAttribute('data-id');
+                if (confirm(`האם אתה בטוח שברצונך למחוק את הסוכן מספר ${agentId}?`)) {
+                    // כאן תהיה פעולת המחיקה מול השרת
+                    alert('הסוכן נמחק בהצלחה');
+                    this.closest('tr').remove();
+                }
+            });
+        });
+    }
+    
+    // הפעלת כל הפונקציות הדרושות
+    initAdmin();
+    setupImageUploadPreview(); // הפעלת טיפול בתמונות
+
+    // חלק הוספת הפונקציונליות ליצירת פתקי פרסום יתווסף בהמשך
+});

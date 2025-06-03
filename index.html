@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הום-לנד נכסים - נכסים מבית טוב</title>
+    <meta name="description" content="הום-לנד נכסים - משרד תיווך מוביל בירושלים">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="images/logo.png" alt="הום-לנד נכסים" class="logo-img">
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="active">דף הבית</a></li>
+                    <li><a href="#properties">נכסים</a></li>
+                    <li><a href="#agents">הסוכנים שלנו</a></li>
+                    <li><a href="#about">אודות</a></li>
+                    <li><a href="#contact">צור קשר</a></li>
+                    <li><a href="/admin" class="admin-btn">כניסה לסוכנים</a></li>
+                </ul>
+            </nav>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="main-title">מצאו את הבית החלומי שלכם</h1>
+                <p class="subtitle">הום-לנד נכסים - המומחים למציאת הנכס המושלם עבורכם בירושלים</p>
+                <div class="search-box">
+                    <form action="/search" method="get" class="search-form">
+                        <div class="form-group">
+                            <select name="property_type" id="property_type">
+                                <option value="" selected>סוג הנכס</option>
+                                <option value="apartment">דירה</option>
+                                <option value="house">בית פרטי</option>
+                                <option value="penthouse">פנטהאוז</option>
+                                <option value="commercial">מסחרי</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="area" id="area">
+                                <option value="" selected>אזור</option>
+                                <option value="center">מרכז ירושלים</option>
+                                <option value="north">צפון ירושלים</option>
+                                <option value="south">דרום ירושלים</option>
+                                <option value="east">מזרח ירושלים</option>
+                                <option value="west">מערב ירושלים</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="rooms" id="rooms">
+                                <option value="" selected>חדרים</option>
+                                <option value="1-2">1-2</option>
+                                <option value="3-4">3-4</option>
+                                <option value="5+">5+</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="search-btn">חיפוש <i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section id="properties" class="properties-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>נכסים מומלצים</h2>
+                <p>הנכסים החמים ביותר שלנו</p>
+            </div>
+            <div class="properties-grid" id="featured-properties">
+                <!-- Properties will be loaded dynamically -->
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="center-btn">
+                <a href="properties.html" class="btn-primary">לכל הנכסים</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents Section -->
+    <section id="agents" class="agents-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>הסוכנים המומחים שלנו</h2>
+                <p>צוות המקצוענים שילווה אתכם לדירה החדשה</p>
+            </div>
+            <div class="agents-grid">
+                <!-- Agents will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <div class="section-header">
+                        <h2>אודות הום-לנד נכסים</h2>
+                    </div>
+                    <p>הום-לנד נכסים הוא משרד תיווך מוביל בירושלים המתמחה במציאת הנכס המושלם עבור לקוחותינו.</p>
+                    <p>עם צוות סוכנים מקצועי ומנוסה, אנו מחויבים להעניק שירות מעולה ולהתאים לכל לקוח את הנכס המתאים לצרכיו.</p>
+                    <p>בין אם אתם מחפשים לקנות, למכור או להשכיר נכס, הצוות שלנו כאן כדי לעזור לכם להשיג את התוצאות הטובות ביותר.</p>
+                    <div class="about-features">
+                        <div class="feature">
+                            <i class="fas fa-home"></i>
+                            <h3>מגוון רחב של נכסים</h3>
+                            <p>מבחר עשיר של דירות, בתים ונכסים מסחריים</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-star"></i>
+                            <h3>שירות אישי</h3>
+                            <p>ליווי צמוד לאורך כל התהליך</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h3>מומחים לאזור</h3>
+                            <p>הכרות מעמיקה עם שוק הנדל"ן בירושלים</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="images/office.jpg" alt="משרדי הום-לנד נכסים">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>צור קשר</h2>
+                <p>נשמח לעמוד לשירותכם</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>כתובת</h3>
+                        <p>רחוב יפו 97, ירושלים</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <h3>טלפון</h3>
+                        <p><a href="tel:025377377">02-537-7377</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <h3>דואר אלקטרוני</h3>
+                        <p><a href="mailto:info@home-jlm.co.il">info@home-jlm.co.il</a></p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="השם שלך" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="האימייל שלך" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" placeholder="טלפון" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" placeholder="ההודעה שלך" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">שלח הודעה</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.png" alt="הום-לנד נכסים" class="logo-img">
+                    <p>הום-לנד נכסים - נכסים מבית טוב</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-nav">
+                        <h3>ניווט מהיר</h3>
+                        <ul>
+                            <li><a href="/">דף הבית</a></li>
+                            <li><a href="#properties">נכסים</a></li>
+                            <li><a href="#agents">הסוכנים שלנו</a></li>
+                            <li><a href="#about">אודות</a></li>
+                            <li><a href="#contact">צור קשר</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-contact">
+                        <h3>יצירת קשר</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> רחוב יפו 97, ירושלים</p>
+                        <p><i class="fas fa-phone"></i> <a href="tel:025377377">02-537-7377</a></p>
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:info@home-jlm.co.il">info@home-jlm.co.il</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 הום-לנד נכסים. כל הזכויות שמורות.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+</body>
+</html>

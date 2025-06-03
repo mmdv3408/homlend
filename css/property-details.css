@@ -1,0 +1,714 @@
+/* סגנונות לדף נכס ספציפי */
+.property-details-section {
+    padding: 0;
+    background-color: var(--light-bg);
+    min-height: 80vh;
+    position: relative;
+}
+
+/* התאמה לעמדת הניווט */
+.header {
+    position: relative;
+    z-index: 100;
+}
+
+/* התאמת גודל הלוגו בדף הנכס */
+.header .logo img {
+    height: 60px;
+    width: auto;
+}
+
+/* כותרת עליונה מרשימה */
+.property-hero {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    background-color: #333;
+    overflow: hidden;
+    margin-bottom: 30px;
+    margin-top: 90px; /* מרווח מוגדל בחלק העליון כדי להימנע מהסתרה על ידי התפריט */
+    padding-top: 10px; /* ריפוד נוסף לחלק העליון */
+}
+
+.property-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+}
+
+.property-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px;
+    color: white;
+}
+
+.property-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.property-hero-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.property-hero-location {
+    display: flex;
+    align-items: center;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.property-hero-location i {
+    margin-left: 10px;
+}
+
+.property-hero-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background-color: rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.property-view-gallery {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.property-view-gallery:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* מכל ראשי */
+.property-details-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 1200px;
+    margin: -80px auto 40px;
+    position: relative;
+    z-index: 10;
+}
+
+/* גלריית תמונות */
+.property-gallery {
+    margin-top: 30px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-gap: 15px;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 200px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-item::after {
+    content: 'לחצו להגדלה';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover::after {
+    opacity: 1;
+}
+
+.property-thumbnails {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    background-color: #f0f0f0;
+    scrollbar-width: thin;
+    -ms-overflow-style: none;
+}
+
+.property-thumbnails::-webkit-scrollbar {
+    height: 5px;
+}
+
+.property-thumbnails::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+.thumbnail {
+    width: 75px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.thumbnail:hover {
+    opacity: 0.8;
+}
+
+.thumbnail.active {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* מידע נכס */
+.property-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.property-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.property-title {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.property-location {
+    font-size: 1rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.property-location i {
+    margin-left: 8px;
+    color: var(--primary-color);
+}
+
+.property-price {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    background-color: rgba(0, 120, 215, 0.1);
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+.property-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.property-info-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.property-info-item i {
+    color: var(--primary-color);
+    margin-left: 8px;
+    font-size: 1.2rem;
+}
+
+.property-description {
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.property-description h3 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.property-description h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.property-features {
+    margin: 20px 0;
+}
+
+.property-features h3 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.property-features h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.features-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.feature-item i {
+    color: var(--primary-color);
+    margin-left: 8px;
+}
+
+.property-agent {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+    border-right: 4px solid var(--primary-color);
+}
+
+.agent-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.agent-info {
+    margin-right: 20px;
+}
+
+.agent-info h3 {
+    margin: 0 0 5px 0;
+    color: var(--primary-color);
+}
+
+.agent-contact {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.agent-contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.agent-contact a:hover {
+    background-color: var(--secondary-color);
+}
+
+/* כפתור חזרה */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    gap: 5px;
+}
+
+.back-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* מדיה קוורי נוספים */
+@media (max-width: 767px) {
+    .property-content {
+        padding: 20px 15px;
+    }
+    
+    .property-title {
+        font-size: 1.5rem;
+    }
+    
+    .property-price {
+        font-size: 1.4rem;
+    }
+    
+    .property-agent {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .agent-image {
+        margin-bottom: 15px;
+    }
+    
+    .agent-info {
+        margin-right: 0;
+    }
+}
+
+/* עיצוב גלריית תמונות פופ-אפ */
+.gallery-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    color: white;
+    font-size: 35px;
+    cursor: pointer;
+    z-index: 1100;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-navigation {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+}
+
+.nav-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.image-counter {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 20px;
+    padding: 5px 15px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+/* התאמות למובייל */
+@media (max-width: 767px) {
+    .modal-content {
+        max-width: 95%;
+    }
+    
+    .nav-button {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+.property-features {
+    margin-bottom: 30px;
+}
+
+.property-features h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.features-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+}
+
+.feature-item i {
+    margin-left: 8px;
+    color: var(--primary-color);
+}
+
+.property-agent {
+    background: linear-gradient(to left, var(--gradient-start), var(--gradient-end));
+    border-radius: 10px;
+    padding: 25px;
+    color: var(--light-text);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.agent-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+}
+
+.agent-info h3 {
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+}
+
+.agent-info p {
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.agent-contact {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.agent-contact a {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: var(--transition);
+}
+
+.agent-contact a:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.similar-properties {
+    margin-top: 60px;
+}
+
+.similar-properties h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.similar-properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: var(--transition);
+}
+
+.back-button i {
+    margin-left: 8px;
+}
+
+.back-button:hover {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+/* תגובות (Loading States) */
+.loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* רספונסיביות */
+@media (max-width: 768px) {
+    .property-gallery {
+        height: 300px;
+    }
+    
+    .property-agent {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .agent-image {
+        margin-bottom: 15px;
+    }
+    
+    .agent-contact {
+        justify-content: center;
+    }
+}

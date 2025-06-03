@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כל הנכסים - הום-לנד נכסים</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- תפריט -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="images/logo.png" alt="הום-לנד נכסים" class="logo-img">
+                    </a>
+                </div>
+                
+                <button class="menu-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                
+                <nav class="main-nav">
+                    <ul class="nav-list">
+                        <li><a href="index.html">דף הבית</a></li>
+                        <li><a href="properties.html" class="active">כל הנכסים</a></li>
+                        <li><a href="index.html#agents">הסוכנים שלנו</a></li>
+                        <li><a href="index.html#about">אודות</a></li>
+                        <li><a href="index.html#contact" class="nav-cta">צור קשר</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- חיפוש נכסים -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-container">
+                <h2>חיפוש נכסים</h2>
+                <form class="search-form">
+                    <div class="search-input-group">
+                        <select id="property_type" name="property_type">
+                            <option value="">סוג נכס</option>
+                            <option value="מכירה">מכירה</option>
+                            <option value="השכרה">השכרה</option>
+                        </select>
+                    </div>
+                    <div class="search-input-group">
+                        <select id="area" name="area">
+                            <option value="">אזור</option>
+                            <option value="מרכז העיר">מרכז העיר</option>
+                            <option value="רחביה">רחביה</option>
+                            <option value="בקעה">בקעה</option>
+                            <option value="תלפיות">תלפיות</option>
+                            <option value="קרית יובל">קרית יובל</option>
+                        </select>
+                    </div>
+                    <div class="search-input-group">
+                        <select id="rooms" name="rooms">
+                            <option value="">חדרים</option>
+                            <option value="1-2">1-2</option>
+                            <option value="3-4">3-4</option>
+                            <option value="5+">5+</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">חיפוש</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- רשימת כל הנכסים -->
+    <section class="properties-section">
+        <div class="container">
+            <h2 class="section-title">כל הנכסים</h2>
+            
+            <div id="properties-grid" class="properties-grid">
+                <!-- הנכסים יטענו באמצעות JavaScript -->
+                <div class="loading-overlay">
+                    <div class="loader"></div>
+                    <p>טוען נכסים...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- פוטר -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.png" alt="הום-לנד נכסים">
+                    <p>המומחים שלכם בנדל"ן בירושלים</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>ניווט מהיר</h3>
+                    <ul>
+                        <li><a href="index.html">דף הבית</a></li>
+                        <li><a href="properties.html">כל הנכסים</a></li>
+                        <li><a href="index.html#agents">הסוכנים שלנו</a></li>
+                        <li><a href="index.html#about">אודות</a></li>
+                        <li><a href="index.html#contact">צור קשר</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>צור קשר</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> רחוב יפו 97, ירושלים</p>
+                    <p><i class="fas fa-phone"></i> 02-123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@home-lend.co.il</p>
+                    
+                    <div class="social-links">
+                        <a href="#" aria-label="פייסבוק"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="אינסטגרם"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="וואטסאפ"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 הום-לנד נכסים. כל הזכויות שמורות.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // סקריפט ייעודי לדף הנכסים
+        document.addEventListener('DOMContentLoaded', function() {
+            // טעינת כל הנכסים
+            loadAllProperties();
+        });
+
+        // פונקציה לטעינת כל הנכסים
+        async function loadAllProperties() {
+            const propertiesGrid = document.getElementById('properties-grid');
+            if (!propertiesGrid) return;
+            
+            try {
+                // טעינת נכסים מהשרת
+                const properties = await fetchApi('/api/properties');
+                
+                // הסרת מסך הטעינה
+                const loadingOverlay = propertiesGrid.querySelector('.loading-overlay');
+                if (loadingOverlay) {
+                    propertiesGrid.removeChild(loadingOverlay);
+                }
+                
+                if (properties && properties.length > 0) {
+                    // יצירת כרטיסי הנכסים
+                    properties.forEach(property => {
+                        const propertyCard = createPropertyCard(property);
+                        propertiesGrid.appendChild(propertyCard);
+                    });
+                } else {
+                    // אין נכסים להצגה
+                    propertiesGrid.innerHTML = '<div class="no-results">אין נכסים זמינים כרגע.</div>';
+                }
+            } catch (error) {
+                console.error('שגיאה בטעינת נכסים:', error);
+                propertiesGrid.innerHTML = '<div class="error-message">אירעה שגיאה בטעינת הנכסים. נסה שנית מאוחר יותר.</div>';
+            }
+        }
+
+        // פונקציה ליצירת כרטיס נכס
+        function createPropertyCard(property) {
+            const propertyCard = document.createElement('div');
+            propertyCard.className = 'property-card';
+            propertyCard.innerHTML = `
+                <div class="property-image">
+                    <img src="${property.image || 'images/properties/default.jpg'}" alt="${property.title}">
+                    <span class="property-tag">${property.type}</span>
+                </div>
+                <div class="property-info">
+                    <h3 class="property-title">${property.title}</h3>
+                    <div class="property-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${property.address}
+                    </div>
+                    <div class="property-details">
+                        <div class="property-detail">
+                            <span class="detail-value">${property.rooms}</span>
+                            <span class="detail-label">חדרים</span>
+                        </div>
+                        <div class="property-detail">
+                            <span class="detail-value">${property.area} מ"ר</span>
+                            <span class="detail-label">שטח</span>
+                        </div>
+                        <div class="property-detail">
+                            <span class="detail-value">${property.floor || '-'}</span>
+                            <span class="detail-label">קומה</span>
+                        </div>
+                    </div>
+                    <div class="property-price">${property.price}</div>
+                </div>
+            `;
+            
+            propertyCard.addEventListener('click', function() {
+                window.location.href = `property.html?id=${property.id}`;
+            });
+            
+            return propertyCard;
+        }
+    </script>
+</body>
+</html>

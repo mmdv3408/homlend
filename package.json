@@ -1,0 +1,40 @@
+{
+  "name": "homeland-real-estate",
+  "version": "1.0.0",
+  "description": "Homeland Real Estate Agency Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "pm2:start": "pm2 start server.js --name \"homeland-server\" --watch",
+    "pm2:stop": "pm2 stop homeland-server",
+    "pm2:restart": "pm2 restart homeland-server",
+    "pm2:delete": "pm2 delete homeland-server",
+    "pm2:logs": "pm2 logs homeland-server",
+    "pm2:list": "pm2 list",
+    "pm2:save": "pm2 save"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.19.0",
+    "connect-mongo": "^5.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "debug": "^4.3.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.17.1",
+    "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
+    "html-pdf": "^3.0.1",
+    "iconv-lite": "^0.6.3",
+    "mongoose": "^7.0.3",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "readable-stream": "^3.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "pm2": "^5.4.3"
+  }
+}

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחברות - הום-לנד נכסים</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4CB8EA 0%, #6B4DC7 100%);
+            --card-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            --input-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--primary-gradient);
+            position: relative;
+        }
+        
+        .login-page::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('../images/pattern.svg');
+            background-size: cover;
+            opacity: 0.05;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            width: 800px;
+            display: flex;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+        
+        /* עיצוב שני הצדדים */
+        .login-side {
+            flex: 1;
+            padding: 40px;
+        }
+        
+        /* צד הלוגו */
+        .logo-side {
+            background: var(--primary-gradient);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-container {
+            margin-bottom: 30px;
+        }
+        
+        .logo-img {
+            max-width: 220px;
+            height: auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+        }
+        
+        .logo-side h2 {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 80%;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+        
+        /* צד הטופס */
+        .form-side {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .form-header h3 {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+        
+        .form-header h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+        
+        .login-form {
+            text-align: right;
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            font-size: 16px;
+            box-shadow: var(--input-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CB8EA;
+            box-shadow: 0 0 0 2px rgba(76, 184, 234, 0.2);
+        }
+        
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+        
+        .form-group .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            color: #aaa;
+        }
+        
+        .login-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(107, 77, 199, 0.3);
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(107, 77, 199, 0.4);
+        }
+        
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .login-message {
+            margin-top: 20px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+        }
+        
+        .error {
+            display: block;
+            background-color: rgba(227, 52, 47, 0.1);
+            color: #e3342f;
+            border: 1px solid rgba(227, 52, 47, 0.2);
+        }
+        
+        .success {
+            display: block;
+            background-color: rgba(67, 160, 71, 0.1);
+            color: #43a047;
+            border: 1px solid rgba(67, 160, 71, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <!-- צד ימין עם לוגו וכותרת -->
+            <div class="login-side logo-side">
+                <div class="logo-container">
+                    <img src="../images/logo.png" alt="הום-לנד נכסים" class="logo-img">
+                </div>
+                <h2>מערכת ניהול נכסים</h2>
+                <p class="welcome-text">ברוכים הבאים למערכת הניהול של הום-לנד נכסים</p>
+            </div>
+            
+            <!-- צד שמאל עם טופס הכניסה -->
+            <div class="login-side form-side">
+                <div class="form-header">
+                    <h3>כניסה למערכת</h3>
+                </div>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username">שם משתמש</label>
+                        <input type="text" id="username" name="username" placeholder="הכנס שם משתמש" required>
+                        <i class="input-icon fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">סיסמה</label>
+                        <input type="password" id="password" name="password" placeholder="הכנס סיסמה" required>
+                        <i class="input-icon fas fa-lock"></i>
+                    </div>
+                    <button type="submit" class="login-btn">התחברות <i class="fas fa-sign-in-alt"></i></button>
+                </form>
+                <div id="loginMessage" class="login-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginMessage = document.getElementById('loginMessage');
+            
+            // בדיקה אם המשתמש כבר מחובר
+            fetch('/api/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.authenticated) {
+                        // אם המשתמש כבר מחובר, הפניה לדף הניהול
+                        window.location.href = '/admin';
+                    }
+                });
+            
+            // טיפול בשליחת טופס ההתחברות
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                // הסרת הודעות קודמות
+                loginMessage.className = 'login-message';
+                loginMessage.style.display = 'none';
+                
+                // שליחת בקשת התחברות לשרת
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // הקוקיס נשלחו כבר מהשרת
+                        // הצגת הודעת הצלחה
+                        loginMessage.textContent = data.message;
+                        loginMessage.className = 'message success';
+                        loginMessage.style.display = 'block';
+                        
+                        // הפניה לדף הניהול
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 500);
+                    } else {
+                        // התחברות נכשלה
+                        loginMessage.textContent = data.message;
+                        loginMessage.classList.add('error');
+                        loginMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('שגיאה בהתחברות:', error);
+                    loginMessage.textContent = 'אירעה שגיאה בתהליך ההתחברות. אנא נסה שוב.';
+                    loginMessage.classList.add('error');
+                    loginMessage.style.display = 'block';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

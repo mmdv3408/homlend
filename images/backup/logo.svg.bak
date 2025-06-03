@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3498db" />
+      <stop offset="100%" stop-color="#8e44ad" />
+    </linearGradient>
+  </defs>
+  <!-- רקע מרובע עם קצוות מעוגלים -->
+  <rect x="50" y="50" width="200" height="200" rx="30" ry="30" fill="#fff" />
+  
+  <!-- האות H -->
+  <path d="M70,70 L70,230 L110,230 L110,165 L190,165 L190,230 L230,230 L230,70 L190,70 L190,125 L110,125 L110,70 Z" fill="url(#logoGradient)" />
+  
+  <!-- החץ למעלה בתוך ה-H -->
+  <path d="M150,105 L180,155 L120,155 Z" fill="url(#logoGradient)" />
+</svg>

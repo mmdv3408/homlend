@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "אלי בלוך",
+    "title": "סוכן נדל\"ן בכיר",
+    "phone": "052-123-4567",
+    "email": "eli@home-jlm.co.il",
+    "image": "images/agents/agent1.jpg",
+    "userId": 2
+  },
+  {
+    "id": 2,
+    "name": "יחיאל דויטש",
+    "title": "סוכן נדל\"ן",
+    "phone": "054-789-0123",
+    "email": "yd@home-jlm.co.il",
+    "image": "images/agents/agent2.jpg",
+    "userId": 3
+  },
+  {
+    "id": 3,
+    "name": "משה בלוך",
+    "title": "סוכן נדל\"ן",
+    "phone": "052-765-0116",
+    "email": "moshe@home-jlm.co.il",
+    "image": "images/agents/agent3.jpg",
+    "userId": 4
+  }
+]

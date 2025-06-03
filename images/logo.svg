@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 1000 1000">
+  <defs>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4CB8EA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B4DC7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- מבנה הלוגו העליון (האייקון) -->
+  <g transform="translate(350, 120)">
+    <path d="M50,0 L250,0 Q300,0 300,50 L300,150 L250,200 L300,250 L300,350 Q300,400 250,400 L50,400 Q0,400 0,350 L0,50 Q0,0 50,0 Z M150,150 L150,250 L100,200 Z" fill="url(#logo-gradient)"/>
+  </g>
+  
+  <!-- הטקסט HOMELAND -->
+  <g transform="translate(10, 650)">
+    <text font-family="Arial, sans-serif" font-size="150" font-weight="bold" fill="url(#logo-gradient)">
+      <tspan x="0" y="0">HOMELAND</tspan>
+    </text>
+  </g>
+  
+  <!-- הטקסט בעברית -->
+  <g transform="translate(135, 750)">
+    <text font-family="Arial, sans-serif" font-size="60" font-weight="normal" fill="url(#logo-gradient)">
+      <tspan x="0" y="0">הום-לנד - נכסים מבית טוב</tspan>
+    </text>
+  </g>
+</svg>

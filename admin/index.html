@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול - הום-לנד נכסים</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/admin-images.css">
+    <link rel="stylesheet" href="../css/admin-modal.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- הערה: לוגין הועבר לדף נפרד login.html -->
+
+        <!-- פאנל ניהול -->
+        <div class="admin-panel" id="admin-panel">
+            <!-- סרגל צד -->
+            <div class="admin-sidebar">
+                <div class="admin-logo">
+                    <img src="../images/logo.png" alt="הום-לנד נכסים">
+                </div>
+                <ul class="admin-menu">
+                    <li class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> לוח בקרה</li>
+                    <li data-section="properties"><i class="fas fa-home"></i> ניהול נכסים</li>
+                    <li data-section="add-property"><i class="fas fa-plus-circle"></i> הוספת נכס</li>
+                    <li data-section="agents"><i class="fas fa-user-tie"></i> סוכנים</li>
+                    <li data-section="marketing"><i class="fas fa-bullhorn"></i> שיווק</li>
+                </ul>
+                <div class="admin-logout">
+                    <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> התנתקות</button>
+                </div>
+            </div>
+
+            <!-- תוכן הפאנל -->
+            <div class="admin-content">
+                <!-- כותרת עליונה -->
+                <div class="admin-header">
+                    <div class="admin-title">
+                        <h1>לוח בקרה</h1>
+                    </div>
+                    <div class="admin-user">
+                        <span id="currentAgent">שלום, סוכן</span>
+                    </div>
+                </div>
+
+                <!-- אזורי תוכן -->
+                <div class="admin-section active" id="dashboard-section">
+                    <div class="dashboard-stats">
+                        <div class="stat-box">
+                            <i class="fas fa-home"></i>
+                            <h3>נכסים</h3>
+                            <p class="stat-count">15</p>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fas fa-eye"></i>
+                            <h3>צפיות היום</h3>
+                            <p class="stat-count">37</p>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fas fa-phone"></i>
+                            <h3>פניות</h3>
+                            <p class="stat-count">5</p>
+                        </div>
+                    </div>
+                    <div class="recent-activity">
+                        <h2>פעילות אחרונה</h2>
+                        <ul class="activity-list">
+                            <li>
+                                <span class="activity-time">10:25</span>
+                                <span class="activity-text">נכס חדש נוסף: "דירת 3 חדרים ברחוב הפלמ"ח"</span>
+                            </li>
+                            <li>
+                                <span class="activity-time">אתמול</span>
+                                <span class="activity-text">התקבלה פנייה חדשה לנכס "פנטהאוז 5 חדרים"</span>
+                            </li>
+                            <li>
+                                <span class="activity-time">אתמול</span>
+                                <span class="activity-text">עודכנו פרטי נכס: "דירת גן 4 חדרים"</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="properties-section">
+                    <div class="section-header">
+                        <h2>ניהול נכסים</h2>
+                        <button class="btn-primary" id="addPropertyBtn"><i class="fas fa-plus"></i> הוסף נכס</button>
+                    </div>
+                    <div class="properties-list">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>תמונה</th>
+                                    <th>כותרת</th>
+                                    <th>סוג</th>
+                                    <th>מחיר</th>
+                                    <th>תאריך</th>
+                                    <th>סטטוס</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody id="propertiesTableBody">
+                                <!-- הנתונים יטענו דינמית -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="add-property-section">
+                    <div class="section-header">
+                        <h2>הוספת נכס חדש</h2>
+                    </div>
+                    <div class="property-form">
+                        <form id="addPropertyForm">
+                            <!-- שדה מוסתר למזהה הנכס - משמש לעריכת נכסים -->
+                            <input type="hidden" id="property-id" name="id" value="">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="property-title">כותרת הנכס</label>
+                                    <input type="text" id="property-title" name="title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-type">סוג עסקה</label>
+                                    <select id="property-type" name="type" required>
+                                        <option value="">בחר סוג עסקה</option>
+                                        <option value="מכירה">מכירה</option>
+                                        <option value="השכרה">השכרה</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-price">מחיר</label>
+                                    <input type="text" id="property-price" name="price" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-rooms">חדרים</label>
+                                    <select id="property-rooms" name="rooms" required>
+                                        <option value="">בחר מספר חדרים</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6+">6+</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-area">שטח (מ"ר)</label>
+                                    <input type="number" id="property-area" name="area" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-floor">קומה</label>
+                                    <select id="property-floor" name="floor">
+                                        <option value="">בחר קומה</option>
+                                        <option value="-1">מרתף</option>
+                                        <option value="0">קרקע</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6+">6+</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-neighborhood">שכונה</label>
+                                    <input type="text" id="property-neighborhood" name="neighborhood" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="property-address">כתובת</label>
+                                    <input type="text" id="property-address" name="address" required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label class="form-label" for="property-description">תיאור הנכס</label>
+                                    <textarea id="property-description" name="description" required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">מאפיינים</label>
+                                    <div class="features-grid">
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-elevator" name="features[]" value="מעלית">
+                                            <label for="feature-elevator">מעלית</label>
+                                        </div>
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-parking" name="features[]" value="חניה">
+                                            <label for="feature-parking">חניה</label>
+                                        </div>
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-balcony" name="features[]" value="מרפסת">
+                                            <label for="feature-balcony">מרפסת</label>
+                                        </div>
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-ac" name="features[]" value="מיזוג">
+                                            <label for="feature-ac">מיזוג</label>
+                                        </div>
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-storage" name="features[]" value="מחסן">
+                                            <label for="feature-storage">מחסן</label>
+                                        </div>
+                                        <div class="feature-checkbox">
+                                            <input type="checkbox" id="feature-accessible" name="features[]" value="נגיש">
+                                            <label for="feature-accessible">נגיש</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="property-status">סטטוס</label>
+                                    <select id="property-status" name="status" required>
+                                        <option value="פעיל">פעיל</option>
+                                        <option value="טיוטה">טיוטה</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="property-featured">נכס חם לעמוד הבית</label>
+                                    <select id="property-featured" name="featured">
+                                        <option value="false">לא</option>
+                                        <option value="true">כן</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="image-uploader">
+                                <div class="image-uploader-header">
+                                    <h3>תמונות הנכס</h3>
+                                    <div class="upload-wrapper">
+                                        <!-- תמונה ראשית -->
+                                        <div class="upload-section main-image-section">
+                                            <h4>תמונה ראשית</h4>
+                                            <div class="upload-btn-wrapper">
+                                                <button type="button" class="upload-btn primary-img-btn">
+                                                    <i class="fas fa-upload"></i> העלאת תמונה ראשית
+                                                </button>
+                                                <input type="file" name="image" id="property-main-image" accept="image/*">
+                                            </div>
+                                            <div class="main-image-preview" id="main-image-preview">
+                                                <!-- כאן תופיע תמונה ראשית -->
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- תמונות נוספות -->
+                                        <div class="upload-section additional-images-section">
+                                            <h4>תמונות נוספות</h4>
+                                            <div class="upload-btn-wrapper">
+                                                <button type="button" class="upload-btn additional-img-btn">
+                                                    <i class="fas fa-images"></i> העלאת תמונות נוספות
+                                                </button>
+                                                <input type="file" name="additional_images" id="property-additional-images" multiple accept="image/*">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="note">ניתן להעלות תמונה ראשית אחת ועד 5 תמונות נוספות בפורמט JPG, PNG</p>
+                                <div class="image-preview-container">
+                                    <div id="main-image-preview" class="main-preview">
+                                        <!-- כאן תופיע התמונה הראשית -->
+                                    </div>
+                                    <div id="additional-images-preview" class="additional-previews">
+                                        <!-- כאן יופיעו תמונות נוספות -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="cancelPropertyBtn">ביטול</button>
+                                <button type="submit" class="btn-primary">שמירת נכס</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- אזור יצירת פרסומים -->
+                <div class="admin-section" id="marketing-section">
+                    <div class="section-header">
+                        <h2>יצירת חומרי שיווק</h2>
+                    </div>
+                    <div class="property-form">
+                        <form id="marketingForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="marketing-property">בחר נכס</label>
+                                    <select id="marketing-property" name="property_id" required>
+                                        <option value="">בחר נכס</option>
+                                        <!-- אפשרויות ייטענו דינמית -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="marketing-template">בחר תבנית</label>
+                                    <select id="marketing-template" name="template_id" required>
+                                        <option value="1">תבנית סטנדרטית</option>
+                                        <option value="2">תבנית מודרנית</option>
+                                        <option value="3">תבנית יוקרתית</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="marketing-title">כותרת הפרסום</label>
+                                    <input type="text" id="marketing-title" name="title">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="marketing-subtitle">משפט משנה</label>
+                                    <input type="text" id="marketing-subtitle" name="subtitle">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label class="form-label" for="marketing-description">טקסט נוסף</label>
+                                    <textarea id="marketing-description" name="description"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="marketing-agent">סוכן</label>
+                                    <select id="marketing-agent" name="agent_id">
+                                        <option value="">בחר סוכן</option>
+                                        <!-- אפשרויות ייטענו דינמית -->
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="preview-section">
+                                <h3>תצוגה מקדימה</h3>
+                                <div id="pdf-preview" class="marketing-preview">
+                                    <!-- כאן תוצג תצוגה מקדימה של הפרסום -->
+                                    <div class="marketing-placeholder">בחר נכס ותבנית לתצוגה מקדימה</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="previewMarketingBtn">תצוגה מקדימה</button>
+                                <button type="submit" class="btn-primary">הורדה כ-PDF</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- אזור ניהול סוכנים -->
+                <div class="admin-section" id="agents-section">
+                    <div class="section-header">
+                        <h2>ניהול סוכנים</h2>
+                        <button class="btn-primary" id="addAgentBtn"><i class="fas fa-plus"></i> הוסף סוכן</button>
+                    </div>
+                    <div class="agents-list">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>תמונה</th>
+                                    <th>שם</th>
+                                    <th>תפקיד</th>
+                                    <th>טלפון</th>
+                                    <th>אימייל</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentsTableBody">
+                                <!-- הנתונים יטענו דינמית -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for agent editing/adding -->
+    <div id="agent-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="agent-modal-title">הוספת סוכן חדש</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="agentForm">
+                    <input type="hidden" id="agent-id" name="id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="agent-name">שם הסוכן</label>
+                            <input type="text" id="agent-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="agent-title">תפקיד</label>
+                            <input type="text" id="agent-title" name="title" placeholder="סוכן נדל&quot;ן">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="agent-phone">טלפון</label>
+                            <input type="tel" id="agent-phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="agent-email">אימייל</label>
+                            <input type="email" id="agent-email" name="email" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label" for="agent-bio">אודות</label>
+                            <textarea id="agent-bio" name="bio" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="image-uploader">
+                        <div class="image-uploader-header">
+                            <h3>תמונת סוכן</h3>
+                            <div class="upload-wrapper">
+                                <div class="upload-btn-wrapper">
+                                    <button type="button" class="upload-btn agent-img-btn">
+                                        <i class="fas fa-upload"></i> העלאת תמונה
+                                    </button>
+                                    <input type="file" name="image" id="agent-image" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="image-preview-container">
+                            <div id="agent-image-preview" class="agent-preview">
+                                <!-- כאן תופיע תמונת הסוכן -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelAgentBtn">ביטול</button>
+                        <button type="submit" class="btn-primary">שמירת סוכן</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js?v=1.2"></script>
+    <script src="./check-auth.js"></script>
+</body>
+</html>

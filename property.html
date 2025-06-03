@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פרטי נכס - הום-לנד נכסים</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/property-details.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- תפריט -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="images/logo.png" alt="הום-לנד נכסים">
+                    </a>
+                </div>
+                
+                <button class="menu-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                
+                <nav class="main-nav">
+                    <ul class="nav-list">
+                        <li><a href="index.html">דף הבית</a></li>
+                        <li><a href="properties.html">כל הנכסים</a></li>
+                        <li><a href="index.html#agents">הסוכנים שלנו</a></li>
+                        <li><a href="index.html#about">אודות</a></li>
+                        <li><a href="index.html#contact" class="nav-cta">צור קשר</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- מידע על הנכס -->
+    <section class="property-details-section">
+        <div class="container">
+            <div class="loading-overlay" id="property-loading">
+                <div class="loader"></div>
+                <p>טוען פרטי נכס...</p>
+            </div>
+            
+            <div class="property-details-container" id="property-container" style="display: none;">
+                <!-- תוכן הנכס יטען באמצעות JavaScript -->
+            </div>
+            
+            <div class="error-message" id="property-error" style="display: none;">
+                <h2>שגיאה בטעינת פרטי הנכס</h2>
+                <p>לא ניתן לטעון את פרטי הנכס המבוקש. אנא נסה שנית מאוחר יותר או חזור <a href="properties.html">לדף הנכסים</a>.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- נכסים דומים -->
+    <section class="similar-properties-section">
+        <div class="container">
+            <h2 class="section-title">נכסים דומים שעשויים לעניין אותך</h2>
+            <div id="similar-properties" class="properties-grid small-grid">
+                <!-- נכסים דומים יטענו באמצעות JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- פוטר -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.png" alt="הום-לנד נכסים">
+                    <p>המומחים שלכם בנדל"ן בירושלים</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>ניווט מהיר</h3>
+                    <ul>
+                        <li><a href="index.html">דף הבית</a></li>
+                        <li><a href="properties.html">כל הנכסים</a></li>
+                        <li><a href="index.html#agents">הסוכנים שלנו</a></li>
+                        <li><a href="index.html#about">אודות</a></li>
+                        <li><a href="index.html#contact">צור קשר</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>צור קשר</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> רחוב יפו 97, ירושלים</p>
+                    <p><i class="fas fa-phone"></i> 02-123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@home-lend.co.il</p>
+                    
+                    <div class="social-links">
+                        <a href="#" aria-label="פייסבוק"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="אינסטגרם"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="וואטסאפ"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 הום-לנד נכסים. כל הזכויות שמורות.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // סקריפט ייעודי לדף נכס בודד
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPropertyDetails();
+        });
+        
+        // פונקציה לקבלת פרמטרים מה-URL
+        function getURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                id: params.get('id')
+            };
+        }
+        
+        // פונקציה לטעינת פרטי הנכס
+        async function loadPropertyDetails() {
+            const params = getURLParams();
+            const propertyId = params.id;
+            
+            if (!propertyId) {
+                showError('לא צוין מזהה נכס');
+                return;
+            }
+            
+            try {
+                // טעינת פרטי הנכס מהשרת
+                const properties = await fetchApi('/api/properties');
+                const property = properties.find(p => p.id == propertyId);
+                
+                if (!property) {
+                    showError('הנכס המבוקש לא נמצא');
+                    return;
+                }
+                
+                // הצגת פרטי הנכס
+                displayPropertyDetails(property);
+                
+                // טעינת נכסים דומים
+                loadSimilarProperties(property);
+                
+            } catch (error) {
+                console.error('שגיאה בטעינת פרטי הנכס:', error);
+                showError('אירעה שגיאה בטעינת פרטי הנכס');
+            }
+        }
+        
+        // פונקציה להצגת הודעת שגיאה
+        function showError(message) {
+            const errorElement = document.getElementById('property-error');
+            errorElement.style.display = 'block';
+            errorElement.querySelector('p').textContent = message + '. אנא נסה שנית מאוחר יותר או חזור לדף הנכסים.';
+        }
+    </script>
+    
+    <!-- סקריפטים חיצוניים -->
+    <script src="js/main.js"></script>
+    <script src="js/property.js"></script>
+</body>
+</html>

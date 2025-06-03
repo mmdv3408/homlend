@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "MoishiAdmin2025",
+    "name": "מנהל המערכת",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "username": "eli",
+    "password": "Eli1234",
+    "name": "אלי בלוך",
+    "role": "agent"
+  },
+  {
+    "id": 3,
+    "username": "yechiel",
+    "password": "Yechiel1234",
+    "name": "יחיאל דויטש",
+    "role": "agent"
+  },
+  {
+    "id": 4,
+    "username": "moshe",
+    "password": "Moshe1234",
+    "name": "משה בלוך",
+    "role": "agent"
+  }
+]

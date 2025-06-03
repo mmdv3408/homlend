@@ -1,22 +1,21 @@
 [
   {
     "id": "3",
-    "title": "חזון איש",
+    "title": "חזון אי",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
     "formattedPrice": "₪4,500",
-    "type": "מכירה",
+    "type": "השכרה",
     "images": [
-      "uploads/image-1748925231753-412817714.jpg",
-      "uploads/additional_images-1748924815068-31920268.png"
+      "/uploads/image-1748965964329-892404832.jpg"
     ],
     "rooms": "3",
     "area": "8484",
     "floor": "2",
     "features": [
       "מיזוג",
-      "[\"מיזוג\"]"
+      "[]"
     ],
     "neighborhood": "בב",
     "status": "פעיל",
@@ -24,8 +23,8 @@
     "createdAt": "2025-06-01T07:23:07.677Z",
     "property_images[]": {},
     "agentName": "מנהל המערכת",
-    "featured": false,
-    "updatedAt": "2025-06-03T13:10:48.277Z",
+    "featured": "false",
+    "updatedAt": "2025-06-03T15:56:24.199Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",

@@ -213,20 +213,10 @@ function fillPropertyForm(property) {
     // בחירת האם נכס חם לעמוד הבית
     if (form.elements['featured']) {
         const featuredSelect = form.elements['featured'];
-        // בדיקה יסודית למצב השדה נכס חם
-        console.log('ערך שדה נכס חם:', property.featured, typeof property.featured);
-        
-        // המרה לבוליאני אמיתי
-        const isFeatured = property.featured === true || property.featured === 'true' || property.featured === 1 || property.featured === '1';
-        console.log('האם נכס חם:', isFeatured);
-        
-        // בחירת האופציה המתאימה
+        const isFeatured = property.featured === true || property.featured === 'true';
         for (let i = 0; i < featuredSelect.options.length; i++) {
-            const optionValue = featuredSelect.options[i].value;
-            console.log(`בדיקת אופציה ${i}:`, optionValue);
-            
-            if ((optionValue === 'true' && isFeatured) || (optionValue === 'false' && !isFeatured)) {
-                console.log(`בחירת אופציה ${i}:`, optionValue);
+            if ((featuredSelect.options[i].value === 'true' && isFeatured) || 
+                (featuredSelect.options[i].value === 'false' && !isFeatured)) {
                 featuredSelect.selectedIndex = i;
                 break;
             }
@@ -241,93 +231,38 @@ function fillPropertyForm(property) {
     }
     
     // הצגת תמונות קיימות אם יש
-    console.log('בדיקת תמונות קיימות:', property.images);
-    
-    // נורמליזציה של מערך התמונות
-    let images = [];
-    if (property.images) {
-        if (Array.isArray(property.images)) {
-            images = [...property.images]; // יצירת עותק של המערך
-        } else if (typeof property.images === 'string') {
-            // אם התמונות הגיעו כמחרוזת אחת (JSON או מופרדות בפסיקים)
-            try {
-                images = JSON.parse(property.images);
-                if (!Array.isArray(images)) {
-                    images = [images];
-                }
-            } catch (e) {
-                // אם לא ניתן לפרש כ-JSON, מניחים שמדובר במחרוזת בודדת
-                images = property.images.split(',').map(img => img.trim()).filter(img => img);
-            }
-        }
-    }
-    
-    console.log('מערך תמונות מנורמל:', images);
-    
-    // עדכון מערך התמונות המקורי כדי שיהיה זמין לפונקציות אחרות
-    property.images = images;
-    
-    if (images.length > 0) {
+    if (property.images && Array.isArray(property.images) && property.images.length > 0) {
         const mainImagePreview = document.getElementById('main-image-preview');
         const additionalImagesPreview = document.getElementById('additional-images-preview');
         
-        console.log('מציג תמונות קיימות:', images);
-        
-        // תצוגה מקדימה של תמונה ראשית
         if (mainImagePreview) {
             mainImagePreview.innerHTML = '';
-            const mainImage = images[0];
-            if (mainImage) {
+            // תמונה ראשית
+            if (property.images[0]) {
                 const img = document.createElement('img');
-                const imgSrc = mainImage.startsWith('/') || mainImage.startsWith('http') ? 
-                    mainImage : ('/' + mainImage);
-                img.src = imgSrc;
+                img.src = property.images[0];
                 img.className = 'preview-image';
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '200px';
-                img.style.display = 'block';
                 mainImagePreview.appendChild(img);
-                console.log('הוספת תמונה ראשית:', imgSrc);
             }
         }
         
-        // תצוגה מקדימה של תמונות נוספות
-        if (additionalImagesPreview && images.length > 1) {
+        if (additionalImagesPreview) {
             additionalImagesPreview.innerHTML = '';
-            for (let i = 1; i < images.length; i++) {
-                const imgSrc = images[i];
-                if (!imgSrc) continue;
-                
+            // תמונות נוספות
+            for (let i = 1; i < property.images.length; i++) {
                 const img = document.createElement('img');
-                const fullImgSrc = imgSrc.startsWith('/') || imgSrc.startsWith('http') ? 
-                    imgSrc : ('/' + imgSrc);
-                    
-                img.src = fullImgSrc;
+                img.src = property.images[i];
                 img.className = 'preview-image';
-                img.style.maxWidth = '100px';
-                img.style.maxHeight = '100px';
-                img.style.display = 'inline-block';
-                img.style.margin = '5px';
                 additionalImagesPreview.appendChild(img);
-                console.log('הוספת תמונה נוספת:', fullImgSrc);
             }
         }
         
         // שמירת נתיבי התמונות הקיימות בשדה מוסתר
-        // מחיקת שדות קיימים אם יש
-        document.querySelectorAll('input[name^="existingImages"]').forEach(input => input.remove());
-        
-        // הוספת כל תמונה בשדה נפרד
-        images.forEach((img, index) => {
-            if (img) {  // וידוא שהערך לא ריק
-                const imgInput = document.createElement('input');
-                imgInput.type = 'hidden';
-                imgInput.name = 'existingImages';
-                imgInput.value = img;
-                form.appendChild(imgInput);
-                console.log(`הוספת תמונה ${index + 1} קיימת:`, img);
-            }
-        });
+        const imagesInput = document.createElement('input');
+        imagesInput.type = 'hidden';
+        imagesInput.name = 'images';
+        imagesInput.value = JSON.stringify(property.images);
+        form.appendChild(imagesInput);
     }
     
     // עדכון כפתור השליחה
@@ -459,11 +394,6 @@ function loadProperties() {
             return response.json();
         })
         .then(properties => {
-            // שמירת הנתונים במשתנה הגלובלי
-            propertiesData = properties;
-            return properties;
-        })
-        .then(properties => {
             // שמירת המידע במשתנה הגלובלי
             propertiesData = properties;
             
@@ -514,107 +444,54 @@ function loadProperties() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('אתחול טופס הוספת נכס');
     
-    // פונקציה להגדרת טופס נכס
-    const propertyForm = document.getElementById('addPropertyForm');
-    if (propertyForm) {
-        // הסרת מאזינים קודמים למניעת כפילות
-        const newForm = propertyForm.cloneNode(true);
-        propertyForm.parentNode.replaceChild(newForm, propertyForm);
+    const addPropertyForm = document.getElementById('addPropertyForm');
+    if (addPropertyForm) {
+        // הסרת מאזינים קודמים למניעת כפילויות
+        const newForm = addPropertyForm.cloneNode(true);
+        addPropertyForm.parentNode.replaceChild(newForm, addPropertyForm);
         
-        // אירוע שליחת טופס
+        // הוספת מאזין חדש
         newForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('שליחת טופס נכס - מאזין חדש');
-
+            console.log('שליחת טופס נכס');
+            
             // יצירת אובייקט FormData מהטופס
             const formData = new FormData(this);
             
-            // בדיקה אם זה עדכון נכס קיים
-            const propertyId = formData.get('id');
-            console.log('מזהה נכס לשליחה:', propertyId);
-            
-            // טיפול במאפיינים (תיבות סימון)
-            const selectedFeatures = [];
-            document.querySelectorAll('.feature-checkbox input[type="checkbox"]:checked').forEach(checkbox => {
-                selectedFeatures.push(checkbox.value);
-            });
-            formData.append('features', JSON.stringify(selectedFeatures));
-            
-            // טיפול בשדה "נכס חם"
-            const featuredSelect = this.elements['featured'];
-            if (featuredSelect) {
-                const featuredValue = featuredSelect.options[featuredSelect.selectedIndex].value;
-                console.log('ערך שדה נכס חם לשליחה:', featuredValue);
-                formData.set('featured', featuredValue === 'true');
-            }
             // הדפסת נתוני הטופס לבדיקה
-            console.log('נתוני הטופס לשליחה:');
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ': ' + pair[1]);
             }
+            
+            // הוספת המאפיינים כמערך JSON
+            const selectedFeatures = [];
+            document.querySelectorAll('.feature-checkbox:checked').forEach(checkbox => {
+                selectedFeatures.push(checkbox.value);
+            });
+            formData.append('features', JSON.stringify(selectedFeatures));
             
             // שליחת הנתונים לשרת
             let url = '/api/properties';
             let method = 'POST';
             
-            // בדיקה מדויקת יותר עבור מזהה
-            if (propertyId && propertyId.trim() !== '') {
+            // אם זה עדכון נכס קיים
+            const propertyId = formData.get('id');
+            console.log('מזהה נכס:', propertyId);
+            
+            if (propertyId && propertyId !== '') {
                 url = `/api/properties/${propertyId}`;
                 method = 'PUT';
                 console.log('מצב עריכה: שולח בקשת PUT ל-', url);
-                
-                console.log('מצב עריכה - טיפול בתמונות קיימות');
-                
-                // בדיקה אם יש שדות תמונות קיימות
-                const existingImagesInputs = document.querySelectorAll('input[name^="existingImages"]');
-                console.log(`נמצאו ${existingImagesInputs.length} שדות תמונות קיימות`);
-                
-                // ניקוי כל שדות existingImages קיימים מהפורם
-                formData.delete('existingImages');
-                
-                // הוספת כל תמונה קיימת כפרמטר נפרד
-                existingImagesInputs.forEach(input => {
-                    if (input && input.value && input.value.trim() !== '') {
-                        let imgPath = input.value.trim();
-                        // הסרת לוכסן התחלתי אם קיים
-                        if (imgPath.startsWith('/')) {
-                            imgPath = imgPath.substring(1);
-                        }
-                        // הוספת כל תמונה קיימת כשדה נפרד
-                        formData.append('existingImages', imgPath);
-                        console.log('הוספת תמונה קיימת:', imgPath);
-                    }
-                });
-                
-                // בדיקה אם הועלו תמונות חדשות
-                const mainImageFile = formData.get('image');
-                const additionalImagesFiles = formData.getAll('additional_images');
-                const hasNewMainImage = mainImageFile && mainImageFile instanceof File && mainImageFile.size > 0;
-                const hasNewAdditionalImages = additionalImagesFiles.length > 0 && 
-                    additionalImagesFiles.some(f => f instanceof File && f.size > 0);
-                
-                console.log('תמונה ראשית חדשה:', hasNewMainImage ? 'יש' : 'אין');
-                console.log('תמונות נוספות חדשות:', hasNewAdditionalImages ? 'יש' : 'אין');
-                
-                // אם אין תמונות חדשות ולא קיימות, נוסיף מערך ריק
-                if (existingImagesInputs.length === 0 && !hasNewMainImage && !hasNewAdditionalImages) {
-                    console.log('אין תמונות קיימות או חדשות - שולח מערך ריק');
-                    formData.append('existingImages', '[]');
-                }
             } else {
                 console.log('מצב הוספה: שולח בקשת POST ל-', url);
             }
             
-            // שליחת הבקשה לשרת
             fetch(url, {
                 method: method,
                 body: formData
             })
             .then(response => {
                 console.log('תגובת שרת:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
                 return response.json();
             })
             .then(data => {
@@ -622,26 +499,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.success) {
                     alert(propertyId ? 'הנכס עודכן בהצלחה!' : 'הנכס נוסף בהצלחה!');
-                    
-                    // ניקוי הטופס
                     this.reset();
                     document.getElementById('property-id').value = ''; // ניקוי שדה ה-ID
-                    
-                    // ניקוי תמונות מוצגות
-                    const mainImagePreview = document.getElementById('main-image-preview');
-                    const additionalImagesPreview = document.getElementById('additional-images-preview');
-                    if (mainImagePreview) mainImagePreview.innerHTML = '';
-                    if (additionalImagesPreview) additionalImagesPreview.innerHTML = '';
-                    
-                    // הסרת שדה התמונות המוסתר
-                    const existingImagesInput = this.querySelector('input[name="existingImages"]');
-                    if (existingImagesInput) {
-                        existingImagesInput.value = '';
-                    }
 
                     // מעבר לדף ניהול נכסים
-                    showSection('properties');
-                    loadProperties();
+                    const propertiesMenuItem = document.querySelector('[data-section="properties"]');
+                    if (propertiesMenuItem) {
+                        propertiesMenuItem.click(); // לחיצה על הלשונית להפעלת האירוע
+                    }
                 } else {
                     alert(`שגיאה בשמירת הנכס: ${data.error || 'אירעה שגיאה לא ידועה'}`);
                 }

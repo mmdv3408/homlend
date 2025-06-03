@@ -91,9 +91,6 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
   next();
 });
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -309,12 +306,10 @@ app.post('/api/properties', upload.fields([{ name: 'images', maxCount: 10 }]), (
 });
 
 // עדכון נכס קיים (PUT)
-app.put('/api/properties/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'additional_images', maxCount: 10 }]), (req, res) => {
+app.put('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }]), (req, res) => {
   try {
     const idParam = req.params.id;
-    console.log(`בקשת PUT לעדכון נכס עם מזהה ${idParam} התקבלה:`);
-    console.log('Body:', req.body);
-    console.log('Files:', req.files ? Object.keys(req.files) : 'none');
+    console.log(`בקשת עדכון נכס עם מזהה ${idParam} התקבלה:`, req.body);
     
     // קריאת רשימת הנכסים הקיימים
     const properties = readDataFile(PROPERTIES_DATA_FILE, defaultProperties);
@@ -327,157 +322,16 @@ app.put('/api/properties/:id', upload.fields([{ name: 'image', maxCount: 1 }, { 
       return res.status(404).json({ success: false, error: 'הנכס לא נמצא' });
     }
     
-    // טיפול בתמונות
+    // טיפול בתמונות אם הועלו
     let imagePaths = properties[propertyIndex].images || [];
-    console.log('תמונות קיימות במסד הנתונים:', imagePaths);
-    
-    // טיפול בתמונות קיימות
-    console.log('בדיקת שדות תמונות קיימות:', req.body.existingImages);
-    
-    // איתחול מערך נתיבי תמונות
-    imagePaths = [];
-    
-    // בדיקה אם קיימים שדות existingImages
-    if (req.body.existingImages) {
-      try {
-        // אם התקבל מערך של תמונות (כאשר שולחים multiple fields עם אותו שם)
-        if (Array.isArray(req.body.existingImages)) {
-          imagePaths = req.body.existingImages;
-        } 
-        // אם יש מספר שדות עם אותו שם, Express משתמש במערך
-        else if (req.body.existingImages && Array.isArray(req.body.existingImages)) {
-          imagePaths = req.body.existingImages;
-        }
-        // אם התקבל ערך בודד
-        else if (typeof req.body.existingImages === 'string') {
-          const trimmed = req.body.existingImages.trim();
-          // בדיקה אם זה מערך ב-JSON
-          if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-            try {
-              const parsed = JSON.parse(trimmed);
-              imagePaths = Array.isArray(parsed) ? parsed : [parsed];
-            } catch (e) {
-              console.log('שגיאה בפענוח JSON, משתמשים בערך המקורי');
-              imagePaths = [trimmed];
-            }
-          } else {
-            // אם זה לא JSON, נבדוק אם יש פסיקים
-            if (trimmed.includes(',')) {
-              imagePaths = trimmed.split(',').map(img => img.trim()).filter(img => img);
-            } else {
-              imagePaths = [trimmed];
-            }
-          }
-        }
-        
-        console.log('נמצאו תמונות קיימות לאחר עיבוד:', imagePaths);
-      } catch (e) {
-        console.error('שגיאה בעיבוד נתיבי תמונות קיימות:', e);
-      }
-    }
-    
-    // ניקוי מערך התמונות
-    imagePaths = imagePaths
-      .filter(img => img && typeof img === 'string' && img.trim() !== '')
-      .map(img => img.trim())
-      .filter(img => !img.includes('[') && !img.includes(']'));
-    
-    console.log('נתיבי תמונות סופיים לאחר ניקוי:', imagePaths);
-    
-    // בדיקה אם הועלו תמונות חדשות
-    let hasNewImages = false;
-    if (req.files) {
-      // תמונה ראשית חדשה
-      if (req.files.image && req.files.image.length > 0 && req.files.image[0].size > 0) {
-        const mainImagePath = '/uploads/' + req.files.image[0].filename;
-        console.log(`הועלה תמונה ראשית חדשה:`, mainImagePath);
-        
-        // מחליף את התמונה הראשית אם קיימת, או מוסיף אם אין תמונות
-        if (imagePaths.length > 0) {
-          imagePaths[0] = mainImagePath;
-        } else {
-          imagePaths.push(mainImagePath);
-        }
-        hasNewImages = true;
-      }
-      
-      // תמונות נוספות חדשות
-      if (req.files.additional_images && req.files.additional_images.length > 0) {
-        // סינון רק תמונות בגודל גדול מ-0
-        const validAdditionalImages = req.files.additional_images.filter(file => file.size > 0);
-        
-        if (validAdditionalImages.length > 0) {
-          const additionalImagePaths = validAdditionalImages.map(file => '/uploads/' + file.filename);
-          console.log(`הועלו ${additionalImagePaths.length} תמונות נוספות חדשות:`, additionalImagePaths);
-          
-          // הוספת תמונות נוספות למערך התמונות
-          if (imagePaths.length > 0) {
-            // משמרים את התמונה הראשית ומחליפים את כל התמונות הנוספות
-            const mainImage = imagePaths[0];
-            imagePaths = [mainImage, ...additionalImagePaths];
-          } else {
-            // אין תמונות קיימות, נשתמש בתמונות הנוספות בלבד
-            imagePaths = additionalImagePaths;
-          }
-          hasNewImages = true;
-        }
-      }
-      
-      // אם לא הועלו תמונות חדשות, נשאיר את התמונות מ-existingImages
-      if (!hasNewImages && req.body.existingImages) {
-        console.log('לא הועלו תמונות חדשות, משתמש בקיימות:', imagePaths);
-      }
-    } else {
-      console.log('לא התקבלו קבצי תמונות חדשים');
-    }
-    
-    // הכנת הנתונים לעדכון
-    const propertyData = { ...req.body };
-    
-    // מחיקת שדות מיוחדים שלא צריכים להישמר באובייקט הנכס
-    delete propertyData.existingImages;
-    delete propertyData._method;
-    
-    // טיפול במאפיינים אם נשלחו כמחרוזת JSON
-    if (propertyData.features && typeof propertyData.features === 'string') {
-      try {
-        propertyData.features = JSON.parse(propertyData.features);
-      } catch (e) {
-        console.error('שגיאה בפענוח מאפיינים:', e);
-        // אם לא מצליח לפענח כ-JSON, בדיקה אם זו מחרוזת בודדת
-        if (propertyData.features && propertyData.features.trim()) {
-          propertyData.features = [propertyData.features];
-        } else {
-          propertyData.features = [];
-        }
-      }
-    }
-    
-    // וידוא שנוצר מערך למאפיינים
-    if (!Array.isArray(propertyData.features)) {
-      propertyData.features = [];
-    }
-    
-    // טיפול בשדה featured הבוליאני
-    console.log('ערך שדה featured לפני המרה:', propertyData.featured, typeof propertyData.featured);
-    if ('featured' in propertyData) {
-      if (typeof propertyData.featured === 'string') {
-        propertyData.featured = propertyData.featured === 'true' || propertyData.featured === '1';
-      } else if (typeof propertyData.featured === 'number') {
-        propertyData.featured = propertyData.featured === 1;
-      }
-    }
-    console.log('ערך שדה featured לאחר המרה:', propertyData.featured, typeof propertyData.featured);
     
     // עדכון אובייקט הנכס
     const updatedProperty = {
       ...properties[propertyIndex],
-      ...propertyData,
+      ...req.body,
       images: imagePaths,
       updatedAt: new Date().toISOString()
     };
-    
-    console.log('נכס מעודכן:', updatedProperty);
     
     // עדכון המערך
     properties[propertyIndex] = updatedProperty;
@@ -486,14 +340,14 @@ app.put('/api/properties/:id', upload.fields([{ name: 'image', maxCount: 1 }, { 
     const saved = writeDataFile(PROPERTIES_DATA_FILE, properties);
     
     if (saved) {
-      console.log(`הנכס עודכן בהצלחה דרך PUT`);
+      console.log(`הנכס עודכן בהצלחה דרך POST`);
       res.json({ success: true, message: 'הנכס עודכן בהצלחה', property: updatedProperty });
     } else {
       console.error(`שגיאה בשמירת הנכס המעודכן`);
       res.status(500).json({ success: false, error: 'שגיאה בשמירת הנכס' });
     }
   } catch (error) {
-    console.error(`שגיאה בעדכון נכס (PUT):`, error);
+    console.error(`שגיאה בעדכון נכס (POST):`, error);
     res.status(500).json({ success: false, error: 'שגיאה בעדכון הנכס', details: error.message });
   }
 });

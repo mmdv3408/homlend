@@ -171,10 +171,8 @@ function renderProperty(property) {
     
     // הכנת מערך של כל התמונות (ראשית + נוספות)
     allGalleryImages = [mainImage];
-    // בדיקה גם עבור additionalImages וגם עבור additional_images
-    const additionalImages = property.additionalImages || property.additional_images || [];
-    if (additionalImages.length > 0) {
-        allGalleryImages.push(...additionalImages);
+    if (property.additionalImages && property.additionalImages.length > 0) {
+        allGalleryImages.push(...property.additionalImages);
     }
     console.log('נטענו', allGalleryImages.length, 'תמונות בגלרייה');
     

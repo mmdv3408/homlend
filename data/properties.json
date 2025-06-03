@@ -1,7 +1,7 @@
 [
   {
     "id": "3",
-    "title": "חזון אי",
+    "title": "חזון איש 2",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
@@ -24,7 +24,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-03T15:56:24.199Z",
+    "updatedAt": "2025-06-03T16:48:07.591Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",
@@ -129,7 +129,7 @@
     "updatedAt": "2025-05-30T03:47:12.189Z"
   },
   {
-    "title": "מציאה שלא תחזור ",
+    "title": "מציאה שלא תחז",
     "type": "מכירה",
     "price": "12252000 שח",
     "rooms": "4",
@@ -145,10 +145,10 @@
       "מיזוג",
       "מחסן",
       "נגיש",
-      "[\"מעלית\",\"חניה\",\"מרפסת\",\"מיזוג\",\"מחסן\",\"נגיש\"]"
+      "[]"
     ],
     "status": "פעיל",
-    "featured": false,
+    "featured": "false",
     "createdAt": "2025-06-01T07:34:11.349Z",
     "agentName": "מנהל המערכת",
     "id": "1748721556665",
@@ -156,6 +156,6 @@
     "images": [
       "uploads/additional_images-1748924815068-31920268.png"
     ],
-    "updatedAt": "2025-06-03T13:11:55.023Z"
+    "updatedAt": "2025-06-03T16:06:05.256Z"
   }
 ]

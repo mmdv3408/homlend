@@ -1,7 +1,7 @@
 [
   {
     "id": "3",
-    "title": "מוישי ",
+    "title": "חזון איש",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
@@ -25,7 +25,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": false,
-    "updatedAt": "2025-06-03T11:22:08.983Z",
+    "updatedAt": "2025-06-03T13:10:48.277Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",
@@ -68,14 +68,14 @@
     ]
   },
   {
-    "title": "גגכק'צמח3ע/ךנ",
+    "title": "דירה בלב ירושלים ",
     "type": "מכירה",
     "price": "4545",
     "rooms": "2",
     "area": "445",
     "floor": "3",
-    "neighborhood": "אערלחמיארחמ",
-    "address": "ע מחרגע",
+    "neighborhood": "רוממה ",
+    "address": "תובל 12",
     "description": "יארצלחאי",
     "features": [
       "מעלית",
@@ -83,17 +83,20 @@
       "מרפסת",
       "מיזוג",
       "מחסן",
-      "נגיש"
+      "נגיש",
+      "[\"מעלית\",\"חניה\",\"מרפסת\",\"מיזוג\",\"מחסן\",\"נגיש\"]"
     ],
     "status": "פעיל",
-    "featured": "true",
+    "featured": true,
     "createdAt": "2025-06-01T07:33:43.277Z",
     "agentName": "מנהל המערכת",
     "id": "1748552548350",
     "additionalImages": [],
-    "updatedAt": "2025-06-01T07:33:43.684Z",
+    "updatedAt": "2025-06-03T13:11:20.014Z",
     "image": "/uploads/image-1748560595854-745381426.png",
-    "images": []
+    "images": [
+      "uploads/additional_images-1748924815068-31920268.png"
+    ]
   },
   {
     "title": "פנטהאוז במרכז ירושלים ",
@@ -127,7 +130,7 @@
     "updatedAt": "2025-05-30T03:47:12.189Z"
   },
   {
-    "title": "אסת",
+    "title": "מציאה שלא תחזור ",
     "type": "מכירה",
     "price": "12252000 שח",
     "rooms": "4",
@@ -137,15 +140,23 @@
     "address": "יוטואטו",
     "description": "טאטא",
     "features": [
-      "חניה"
+      "מעלית",
+      "חניה",
+      "מרפסת",
+      "מיזוג",
+      "מחסן",
+      "נגיש",
+      "[\"מעלית\",\"חניה\",\"מרפסת\",\"מיזוג\",\"מחסן\",\"נגיש\"]"
     ],
     "status": "פעיל",
-    "featured": "false",
+    "featured": false,
     "createdAt": "2025-06-01T07:34:11.349Z",
     "agentName": "מנהל המערכת",
     "id": "1748721556665",
     "image": "/uploads/image-1748721557468-237501509.jpg",
-    "images": [],
-    "updatedAt": "2025-06-01T07:34:11.392Z"
+    "images": [
+      "uploads/additional_images-1748924815068-31920268.png"
+    ],
+    "updatedAt": "2025-06-03T13:11:55.023Z"
   }
 ]

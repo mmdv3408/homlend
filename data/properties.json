@@ -1,13 +1,15 @@
 [
   {
     "id": "3",
-    "title": "חזון איש ",
+    "title": "חזון איש 1",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
     "formattedPrice": "₪4,500",
     "type": "השכרה",
-    "images": [],
+    "images": [
+      "/uploads/images-1749067364713-316846165.png"
+    ],
     "rooms": "3",
     "area": "8484",
     "floor": "2",
@@ -19,13 +21,8 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-04T19:50:38.784Z",
-    "additionalImages": [
-      "/uploads/additional_images-1748558966335-873746634.jpg",
-      "/uploads/additional_images-1748558971274-606292094.jpg",
-      "/uploads/additional_images-1748558974014-194103057.png",
-      "/uploads/additional_images-1748558974085-961555166.png"
-    ],
+    "updatedAt": "2025-06-04T20:24:26.381Z",
+    "additionalImages": "[\"/uploads/images-1749067362322-30271056.png\"]",
     "image": "/uploads/image-1748558903850-515840714.jpg",
     "keepExistingImages": "true",
     "newImages": "[\"/uploads/images-1749065809397-987304696.jpg\"]"
@@ -40,28 +37,20 @@
     "neighborhood": "רוממה",
     "address": "רחוב בן יהודה 45, ירושלים",
     "description": " יעטעדק",
-    "features": [
-      "מעלית",
-      "חניה",
-      "מרפסת",
-      "מיזוג",
-      "מחסן",
-      "נגיש",
-      "[\"מעלית\",\"חניה\",\"מרפסת\",\"מיזוג\",\"מחסן\",\"נגיש\"]"
-    ],
+    "features": [],
     "status": "פעיל",
-    "featured": true,
+    "featured": "true",
     "createdAt": "2025-06-01T07:27:50.436Z",
     "agentName": "מנהל המערכת",
     "id": "1748552463468",
     "image": "/uploads/image-1748557362718-94519037.jpg",
-    "updatedAt": "2025-06-03T04:14:20.621Z",
+    "updatedAt": "2025-06-04T20:23:55.166Z",
     "additionalImages": [
       "/uploads/additional_images-1748558482747-857553985.jpg"
     ],
-    "images": [
-      "images/properties/property3.jpg"
-    ]
+    "images": [],
+    "keepExistingImages": "false",
+    "newImages": "[\"/uploads/images-1749068635015-877047885.jpg\"]"
   },
   {
     "title": "דירה בלב ירושלים ",

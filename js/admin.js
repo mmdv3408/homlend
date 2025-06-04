@@ -620,17 +620,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.success) {
                         alert('הנכס נשמר בהצלחה!');
                         
-                        // איפוס הטופס
-                        document.getElementById('addPropertyForm').reset();
-                        
                         // עדכון רשימת הנכסים
-                        loadProperties();
-                        
-                        // מעבר לכרטיסיית הנכסים
-                        const propertiesTab = document.getElementById('properties-tab');
-                        if (propertiesTab) {
-                            propertiesTab.click();
-                        }
+                        console.log('טוען מחדש את רשימת הנכסים...');
+                        loadProperties().then(() => {
+                            console.log('רשימת הנכסים נטענה מחדש');
+                            // איפוס הטופס
+                            document.getElementById('addPropertyForm').reset();
+                            
+                            // עדכון תצוגת התמונות
+                            updateImagePreviews(data.property);
+                            
+                            // מעבר לכרטיסיית הנכסים
+                            const propertiesTab = document.getElementById('properties-tab');
+                            if (propertiesTab) {
+                                propertiesTab.click();
+                            }
+                        });
                     } else {
                         throw new Error(data.error || 'אירעה שגיאה בשמירת הנכס');
                     }
@@ -642,6 +647,73 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// פונקציה לעדכון תצוגת התמונות
+function updateImagePreviews(property) {
+    console.log('מעדכן תצוגת תמונות עבור נכס:', property);
+    
+    const mainImagePreview = document.getElementById('main-image-preview');
+    const additionalImagesPreview = document.getElementById('additional-images-preview');
+    
+    // ניקוי התצוגה הנוכחית
+    if (mainImagePreview) mainImagePreview.innerHTML = '';
+    if (additionalImagesPreview) additionalImagesPreview.innerHTML = '';
+    
+    if (!property || !property.images || !Array.isArray(property.images)) {
+        console.log('אין תמונות להציג');
+        return;
+    }
+    
+    console.log('תמונות נטענו:', property.images);
+    
+    // הצגת התמונה הראשית (אם קיימת)
+    if (property.images.length > 0 && mainImagePreview) {
+        const img = document.createElement('img');
+        let imgSrc = property.images[0];
+        
+        // תיקון נתיב תמונה אם חסר / בהתחלה
+        if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+            imgSrc = '/' + imgSrc;
+        }
+        
+        img.src = imgSrc;
+        img.className = 'preview-image';
+        img.onerror = function() {
+            console.error('Error loading main image:', imgSrc);
+            this.style.display = 'none';
+        };
+        mainImagePreview.appendChild(img);
+    }
+    
+    // הצגת שאר התמונות כתמונות נוספות
+    if (property.images.length > 1 && additionalImagesPreview) {
+        const additionalImages = property.images.slice(1);
+        
+        additionalImages.forEach((imgSrc, index) => {
+            if (!imgSrc) return;
+            
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'additional-image-container';
+            
+            const img = document.createElement('img');
+            
+            // תיקון נתיב תמונה אם חסר / בהתחלה
+            if (!imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                imgSrc = '/' + imgSrc;
+            }
+            
+            img.src = imgSrc;
+            img.className = 'preview-image';
+            img.onerror = function() {
+                console.error('Error loading additional image:', imgSrc);
+                this.style.display = 'none';
+            };
+            
+            imgContainer.appendChild(img);
+            additionalImagesPreview.appendChild(imgContainer);
+        });
+    }
+}
 
 // פונקציה למחיקת נכס
 function deleteProperty(propertyId) {

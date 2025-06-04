@@ -1,7 +1,7 @@
 [
   {
     "id": "3",
-    "title": "חזון איש 2",
+    "title": "חזון איש 1",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
@@ -19,7 +19,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-04T17:02:17.051Z",
+    "updatedAt": "2025-06-04T18:47:19.936Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",
@@ -28,7 +28,7 @@
     ],
     "image": "/uploads/image-1748558903850-515840714.jpg",
     "keepExistingImages": "false",
-    "newImages": "[\"/uploads/images-1749056536924-677376350.jpg\"]"
+    "newImages": "[\"/uploads/images-1749062839801-771716439.jpg\"]"
   },
   {
     "title": "דברי חיים 72",

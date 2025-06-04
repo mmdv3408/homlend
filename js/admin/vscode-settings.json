@@ -1,0 +1,103 @@
+{
+  // Format on save
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  // File associations
+  "files.associations": {
+    "*.js": "javascript"
+  },
+
+  // Editor settings
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.renderWhitespace": "selection",
+  "editor.renderControlCharacters": true,
+  "editor.minimap.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.wordWrap": "on",
+  "editor.rulers": [100],
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+
+  // ESLint settings
+  "eslint.validate": ["javascript", "javascriptreact"],
+  "eslint.format.enable": true,
+  "eslint.packageManager": "npm",
+  "eslint.run": "onType",
+  "eslint.workingDirectories": [{"mode": "auto"}],
+
+  // Prettier settings
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "es5",
+  "prettier.printWidth": 100,
+  "prettier.tabWidth": 2,
+  "prettier.semi": true,
+  "prettier.useTabs": false,
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "avoid",
+  "prettier.endOfLine": "lf",
+  "prettier.overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
+      "files": ["*.css", "*.scss"],
+      "options": {
+        "singleQuote": false
+      }
+    },
+    {
+      "files": ["*.md", "*.markdown"],
+      "options": {
+        "proseWrap": "always",
+        "tabWidth": 2,
+        "useTabs": false,
+        "printWidth": 80,
+        "singleQuote": false
+      }
+    }
+  ],
+
+  // File exclusions
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true
+  },
+
+  // Search settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.git": true
+  },
+
+  // Workbench settings
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.iconTheme": "vs-seti",
+  "workbench.startupEditor": "welcomePage",
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.wrapTabs": true,
+  "workbench.list.horizontalScrolling": true
+}

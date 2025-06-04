@@ -1,6 +1,21 @@
-// קובץ JavaScript לפאנל הניהול - הום-לנד נכסים
+/**
+ * קובץ זה שימש כקובץ JavaScript הראשי לפאנל הניהול של הום-לנד נכסים
+ * 
+ * קובץ זה הוחלף במבנה מודולרי חדש בתיקיית /js/admin/
+ * 
+ * המבנה החדש כולל:
+ * - admin-main.js      - נקודת כניסה ראשית
+ * - admin-auth.js      - ניהול התחברות והרשאות
+ * - admin-ui.js        - רכיבי ממשק משתמש וניווט
+ * - admin-properties.js - ניהול נכסים
+ * - admin-agents.js    - ניהול סוכנים
+ * - admin-images.js    - העלאת תמונות ותצוגה מקדימה
+ * - admin-dashboard.js - לוח בקרה
+ */
 
-// משתנים גלובליים
+console.warn('הקובץ admin.js הוחלף במבנה מודולרי חדש. אנא עדכן את הקוד שלך להשתמש בקבצים החדשים בתיקיית /js/admin/');
+
+// משתנים גלובליים - מועברים כעת ל-admin-main.js
 let propertiesData = [];
 let agentsData = [];
 
@@ -898,10 +913,11 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-// הפעלת אתחול כאשר הדף נטען
+// הפעלת אתחול כאשר הדף נטען - מועבר ל-admin-main.js
 document.addEventListener('DOMContentLoaded', function() {
-    // אתחול המערכת
-    initAdmin();
+    console.warn('אנא עדכן את הקוד שלך לטעון את /js/admin/admin-main.js במקום');
+    // אתחול המערכת - מבוצע כעת ב-admin-main.js
+    // initAdmin(); // הוסר לטובת המערכת המודולרית החדשה
     
     // הפעלת טיפול בתמונות
     setupImageUploadPreview();

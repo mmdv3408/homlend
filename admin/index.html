@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/admin-images.css">
     <link rel="stylesheet" href="../css/admin-modal.css">
+    <link rel="stylesheet" href="../css/admin-errors.css">
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -422,7 +423,55 @@
         </div>
     </div>
 
-    <script src="../js/admin.js?v=1.2"></script>
-    <script src="./check-auth.js"></script>
+    <!-- Load our modular admin scripts -->
+    <script type="module">
+        // Display a console message about the new modular structure
+        console.log('המערכת עברה למבנה מודולרי חדש. טוען מודולים...');
+        
+        // Add error handling for module loading
+        window.addEventListener('error', (event) => {
+            console.error('שגיאה בטעינת המודולים:', event.error);
+            alert('אירעה שגיאה בטעינת האפליקציה. אנא רענן את הדף.');
+        });
+        
+        // Load the main admin module
+        try {
+            // Add loading state
+            document.body.classList.add('loading');
+            
+            // Import and initialize the admin module
+            import('../js/admin/admin-main.js')
+                .then(() => console.log('המודולים נטענו בהצלחה!'))
+                .catch(err => {
+                    console.error('שגיאה בטעינת המודולים:', err);
+                    alert('אירעה שגיאה בטעינת האפליקציה. אנא רענן את הדף.');
+                })
+                .finally(() => {
+                    document.body.classList.remove('loading');
+                });
+        } catch (error) {
+            console.error('שגיאה קריטית:', error);
+            alert('אירעה שגיאה חמורה. אנא רענן את הדף או צור קשר עם התמיכה.');
+            document.body.classList.remove('loading');
+        }
+    </script>
+    
+    <!-- Add some basic loading styles -->
+    <style>
+        body.loading::before {
+            content: 'טוען את האפליקציה...';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            z-index: 9999;
+        }
+    </style>
 </body>
 </html>

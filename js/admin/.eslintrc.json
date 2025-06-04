@@ -1,0 +1,44 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "mocha": true
+  },
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": "warn",
+    "eqeqeq": ["error", "always"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-use-before-define": ["error", { "functions": false, "classes": false }],
+    "prefer-arrow-callback": "warn",
+    "prefer-template": "warn",
+    "semi": ["error", "always"],
+    "quotes": ["warn", "single", { "avoidEscape": true }]
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.js"],
+      "env": {
+        "mocha": true
+      },
+      "rules": {
+        "no-unused-expressions": "off"
+      }
+    }
+  ]
+}

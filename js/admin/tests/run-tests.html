@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>בדיקות יחידה - פאנל ניהול הום-לנד</title>
+    <!-- Mocha CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.css"
+    />
+    <style>
+      body {
+        font-family: 'Heebo', Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f7fa;
+        color: #333;
+      }
+      #mocha {
+        margin: 0;
+      }
+      .test h2 {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 10px 0;
+      }
+      .test.pass .duration {
+        color: #28a745;
+      }
+      .test.fail .duration {
+        color: #dc3545;
+      }
+      .test pre {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      .test.fail pre {
+        background-color: #fff5f5;
+        border-color: #ffd6d6;
+      }
+      .suite {
+        margin-bottom: 20px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .suite h1 {
+        font-size: 18px;
+        color: #2c3e50;
+        margin: 0 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .test {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .test.pass {
+        background-color: #f0f9f0;
+        border-left: 3px solid #28a745;
+      }
+      .test.fail {
+        background-color: #fff0f0;
+        border-left: 3px solid #dc3545;
+      }
+      .test.pending {
+        background-color: #fff8e6;
+        border-left: 3px solid #ffc107;
+      }
+      #mocha-stats {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      #mocha-stats .progress {
+        height: 10px;
+        background: #e9ecef;
+        margin-top: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      #mocha-stats .progress .progress-bar {
+        height: 100%;
+        background: #28a745;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      #mocha-stats .passes {
+        color: #28a745;
+      }
+      #mocha-stats .failures {
+        color: #dc3545;
+      }
+      #mocha-stats .pending {
+        color: #ffc107;
+      }
+      .hidden {
+        display: none;
+      }
+      #test-controls {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'Heebo', Arial, sans-serif;
+        margin-left: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+      }
+      #filter {
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px;
+        margin-right: 10px;
+      }
+      .filter-container {
+        display: flex;
+        margin-bottom: 10px;
+      }
+      .test-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .test-summary {
+        font-size: 14px;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>בדיקות יחידה - פאנל ניהול הום-לנד</h1>
+
+    <div id="test-controls">
+      <div class="test-controls">
+        <div class="filter-container">
+          <input type="text" id="filter" placeholder="סנן בדיקות..." />
+          <button id="run-tests">הרץ בדיקות</button>
+        </div>
+        <div class="test-summary">
+          <span id="test-summary">0 בדיקות</span> | <span class="passes">0 עברו</span> |
+          <span class="failures">0 נכשלו</span> |
+          <span class="pending">0 ממתינות</span>
+        </div>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div id="mocha"></div>
+
+    <!-- Test libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.3.7/chai.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sinon.js/15.0.1/sinon.min.js"></script>
+
+    <!-- Test files -->
+    <script>
+      // Configure Mocha
+      mocha.setup('bdd');
+      mocha.checkLeaks();
+
+      // Make expect globally available
+      window.expect = chai.expect;
+
+      // Test filter functionality
+      document.getElementById('filter').addEventListener('input', function (e) {
+        const filter = e.target.value.toLowerCase();
+        const tests = document.querySelectorAll('.test');
+
+        tests.forEach(test => {
+          const title = test.querySelector('h2').textContent.toLowerCase();
+          if (title.includes(filter)) {
+            test.style.display = '';
+          } else {
+            test.style.display = 'none';
+          }
+        });
+      });
+
+      // Run tests button
+      document.getElementById('run-tests').addEventListener('click', function () {
+        // Reset UI
+        document.querySelectorAll('.test').forEach(el => {
+          el.style.display = '';
+        });
+        document.getElementById('filter').value = '';
+
+        // Clear previous results
+        const stats = document.getElementById('mocha-stats');
+        if (stats) {
+          stats.remove();
+        }
+
+        // Run tests
+        mocha.run();
+      });
+
+      // Update progress bar and summary
+      const progressBar = document.querySelector('.progress-bar');
+      const passesEl = document.querySelector('.passes');
+      const failuresEl = document.querySelector('.failures');
+      const pendingEl = document.querySelector('.pending');
+      const summaryEl = document.getElementById('test-summary');
+
+      function updateStats() {
+        const stats = mocha.stats;
+        const total = stats.tests;
+        const passed = stats.passes;
+        const failed = stats.failures;
+        const pending = stats.pending;
+        const progress = total > 0 ? (passed / total) * 100 : 0;
+
+        progressBar.style.width = `${progress}%`;
+        passesEl.textContent = `${passed} עברו`;
+        failuresEl.textContent = `${failed} נכשלו`;
+        pendingEl.textContent = `${pending} ממתינות`;
+        summaryEl.textContent = `${total} בדיקות`;
+
+        // Update colors based on test status
+        if (failed > 0) {
+          progressBar.style.backgroundColor = '#dc3545';
+        } else if (pending > 0) {
+          progressBar.style.backgroundColor = '#ffc107';
+        } else {
+          progressBar.style.backgroundColor = '#28a745';
+        }
+      }
+
+      // Listen for test end to update stats
+      mocha.suite.afterEach(function () {
+        updateStats();
+      });
+    </script>
+
+    <!-- Load test files -->
+    <script type="module" src="./integration.test.js"></script>
+
+    <script>
+      // Auto-run tests when page loads
+      document.addEventListener('DOMContentLoaded', function () {
+        // Run tests after a short delay to ensure everything is loaded
+        setTimeout(() => {
+          mocha.run();
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

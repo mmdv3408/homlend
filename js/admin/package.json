@@ -1,0 +1,57 @@
+{
+  "name": "homeland-admin-panel",
+  "version": "2.0.0",
+  "description": "פאנל ניהול לאתר הום-לנד נכסים",
+  "main": "admin-main.js",
+  "type": "module",
+  "scripts": {
+    "start": "http-server -p 3000 -o /admin/index.html",
+    "test": "mocha tests/**/*.test.js --timeout 10000",
+    "test:watch": "mocha tests/**/*.test.js --watch --timeout 10000",
+    "test:ui": "open tests/run-tests.html",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write \"**/*.js\" \"**/*.html\" \"**/*.css\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "real-estate",
+    "admin-panel",
+    "property-management",
+    "hebrew",
+    "vanilla-js",
+    "frontend"
+  ],
+  "author": "הום-לנד נכסים",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.0.0",
+    "axios": "^1.3.4",
+    "chart.js": "^4.2.1",
+    "flatpickr": "^4.6.13",
+    "quill": "^1.3.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "chai": "^4.3.7",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "http-server": "^14.1.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.2",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.4",
+    "sinon": "^15.0.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": ["eslint --fix", "prettier --write"],
+    "*.{html,css,md,json}": ["prettier --write"]
+  },
+  "browserslist": ["last 2 versions", "not dead", "not ie <= 11"]
+}

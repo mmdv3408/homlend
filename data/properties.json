@@ -7,25 +7,11 @@
     "price": "גגג",
     "formattedPrice": "₪4,500",
     "type": "השכרה",
-    "images": [
-      "/uploads/image-1748965964329-892404832.jpg",
-      "/uploads/images-1749055430209-947241036.jpg",
-      "/uploads/images-1749055459030-155839636.jpg",
-      "/uploads/images-1749055459031-893400343.jpg",
-      "/uploads/images-1749055658777-965072414.jpg"
-    ],
+    "images": [],
     "rooms": "3",
     "area": "8484",
     "floor": "2",
-    "features": [
-      "מעלית",
-      "חניה",
-      "מרפסת",
-      "מיזוג",
-      "מחסן",
-      "נגיש",
-      "[]"
-    ],
+    "features": [],
     "neighborhood": "בב",
     "status": "פעיל",
     "agentId": 3,
@@ -33,7 +19,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-04T16:47:38.824Z",
+    "updatedAt": "2025-06-04T17:02:17.051Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",
@@ -41,7 +27,8 @@
       "/uploads/additional_images-1748558974085-961555166.png"
     ],
     "image": "/uploads/image-1748558903850-515840714.jpg",
-    "keepExistingImages": "true"
+    "keepExistingImages": "false",
+    "newImages": "[\"/uploads/images-1749056536924-677376350.jpg\"]"
   },
   {
     "title": "דברי חיים 72",

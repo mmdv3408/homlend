@@ -1,20 +1,29 @@
 [
   {
     "id": "3",
-    "title": "חזון איש ",
+    "title": "חזון איש 2",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
     "formattedPrice": "₪4,500",
     "type": "השכרה",
     "images": [
-      "/uploads/image-1748965964329-892404832.jpg"
+      "/uploads/image-1748965964329-892404832.jpg",
+      "/uploads/images-1749055430209-947241036.jpg",
+      "/uploads/images-1749055459030-155839636.jpg",
+      "/uploads/images-1749055459031-893400343.jpg",
+      "/uploads/images-1749055658777-965072414.jpg"
     ],
     "rooms": "3",
     "area": "8484",
     "floor": "2",
     "features": [
+      "מעלית",
+      "חניה",
+      "מרפסת",
       "מיזוג",
+      "מחסן",
+      "נגיש",
       "[]"
     ],
     "neighborhood": "בב",
@@ -24,14 +33,15 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-04T15:43:25.025Z",
+    "updatedAt": "2025-06-04T16:47:38.824Z",
     "additionalImages": [
       "/uploads/additional_images-1748558966335-873746634.jpg",
       "/uploads/additional_images-1748558971274-606292094.jpg",
       "/uploads/additional_images-1748558974014-194103057.png",
       "/uploads/additional_images-1748558974085-961555166.png"
     ],
-    "image": "/uploads/image-1748558903850-515840714.jpg"
+    "image": "/uploads/image-1748558903850-515840714.jpg",
+    "keepExistingImages": "true"
   },
   {
     "title": "דברי חיים 72",
@@ -98,7 +108,7 @@
     ]
   },
   {
-    "title": "פנטהאוז במרכז ירושלים ",
+    "title": "פנטהאוז במרכז ירושלים  13",
     "type": "מכירה",
     "price": "1,000,0000 שח",
     "rooms": "5",
@@ -113,10 +123,11 @@
       "מרפסת",
       "מיזוג",
       "מחסן",
-      "נגיש"
+      "נגיש",
+      "[]"
     ],
     "status": "פעיל",
-    "featured": true,
+    "featured": "true",
     "createdAt": "2025-05-30T03:47:11.749Z",
     "agentName": "מנהל המערכת",
     "id": "1748569829105",
@@ -126,7 +137,8 @@
       "/uploads/additional_images-1748569829433-636871638.jpg"
     ],
     "image": "/uploads/image-1748569920855-598891655.jpg",
-    "updatedAt": "2025-05-30T03:47:12.189Z"
+    "updatedAt": "2025-06-04T16:20:50.517Z",
+    "images": []
   },
   {
     "title": "מציאה שלא תחז",

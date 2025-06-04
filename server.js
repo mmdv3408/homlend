@@ -83,7 +83,31 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+// פונקציה לוודא שתיקיית ההעלאות קיימת
+function ensureUploadsDir() {
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log(`נוצרה תיקיית העלאות חדשה ב: ${uploadsDir}`);
+    }
+}
+
+// וידוא שתיקיית ההעלאות קיימת לפני תחילת העבודה
+ensureUploadsDir();
+
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB מקסימום לקובץ
+        files: 10 // מקסימום 10 קבצים
+    },
+    fileFilter: (req, file, cb) => {
+        // בדיקת סוג הקובץ
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+            return cb(new Error('ניתן להעלות קבצי תמונה בלבד (jpg, jpeg, png, gif)'), false);
+        }
+        cb(null, true);
+    }
+});
 
 // הגדרת middleware
 // אפשר גישה מכל מקור
@@ -310,6 +334,7 @@ app.put('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }])
   try {
     const idParam = req.params.id;
     console.log(`בקשת עדכון נכס עם מזהה ${idParam} התקבלה:`, req.body);
+    console.log('קבצים שהועלו:', req.files);
     
     // קריאת רשימת הנכסים הקיימים
     const properties = readDataFile(PROPERTIES_DATA_FILE, defaultProperties);
@@ -323,13 +348,38 @@ app.put('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }])
     }
     
     // טיפול בתמונות אם הועלו
-    let imagePaths = properties[propertyIndex].images || [];
+    let imagePaths = [];
+    
+    // שמירת התמונות הקיימות אם לא נמחקו
+    if (req.body.keepExistingImages === 'true' && properties[propertyIndex].images) {
+      imagePaths = [...properties[propertyIndex].images];
+    }
+    
+    // הוספת תמונות חדשות אם הועלו
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      const newImages = req.files.images.map(file => '/uploads/' + file.filename);
+      imagePaths = [...imagePaths, ...newImages];
+      console.log(`תמונות חדשות נוספו: ${newImages.join(', ')}`);
+    }
+    
+    // עיבוד שדות נוספים
+    let features = [];
+    if (req.body.features) {
+      try {
+        features = typeof req.body.features === 'string' ? 
+          JSON.parse(req.body.features) : 
+          req.body.features;
+      } catch (e) {
+        console.error('שגיאה בפענוח מאפיינים:', e);
+      }
+    }
     
     // עדכון אובייקט הנכס
     const updatedProperty = {
       ...properties[propertyIndex],
       ...req.body,
       images: imagePaths,
+      features: features,
       updatedAt: new Date().toISOString()
     };
     
@@ -340,14 +390,14 @@ app.put('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }])
     const saved = writeDataFile(PROPERTIES_DATA_FILE, properties);
     
     if (saved) {
-      console.log(`הנכס עודכן בהצלחה דרך POST`);
+      console.log(`הנכס עודכן בהצלחה`);
       res.json({ success: true, message: 'הנכס עודכן בהצלחה', property: updatedProperty });
     } else {
       console.error(`שגיאה בשמירת הנכס המעודכן`);
       res.status(500).json({ success: false, error: 'שגיאה בשמירת הנכס' });
     }
   } catch (error) {
-    console.error(`שגיאה בעדכון נכס (POST):`, error);
+    console.error(`שגיאה בעדכון נכס:`, error);
     res.status(500).json({ success: false, error: 'שגיאה בעדכון הנכס', details: error.message });
   }
 });
@@ -357,6 +407,7 @@ app.post('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }]
   try {
     const idParam = req.params.id;
     console.log(`בקשת POST לעדכון נכס עם מזהה ${idParam} התקבלה:`, req.body);
+    console.log('קבצים שהועלו:', req.files);
     
     // קריאת רשימת הנכסים הקיימים
     const properties = readDataFile(PROPERTIES_DATA_FILE, defaultProperties);
@@ -370,13 +421,38 @@ app.post('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }]
     }
     
     // טיפול בתמונות אם הועלו
-    let imagePaths = properties[propertyIndex].images || [];
+    let imagePaths = [];
+    
+    // שמירת התמונות הקיימות אם לא נמחקו
+    if (req.body.keepExistingImages === 'true' && properties[propertyIndex].images) {
+      imagePaths = [...properties[propertyIndex].images];
+    }
+    
+    // הוספת תמונות חדשות אם הועלו
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      const newImages = req.files.images.map(file => '/uploads/' + file.filename);
+      imagePaths = [...imagePaths, ...newImages];
+      console.log(`תמונות חדשות נוספו: ${newImages.join(', ')}`);
+    }
+    
+    // עיבוד שדות נוספים
+    let features = [];
+    if (req.body.features) {
+      try {
+        features = typeof req.body.features === 'string' ? 
+          JSON.parse(req.body.features) : 
+          req.body.features;
+      } catch (e) {
+        console.error('שגיאה בפענוח מאפיינים:', e);
+      }
+    }
     
     // עדכון אובייקט הנכס
     const updatedProperty = {
       ...properties[propertyIndex],
       ...req.body,
       images: imagePaths,
+      features: features,
       updatedAt: new Date().toISOString()
     };
     
@@ -387,14 +463,14 @@ app.post('/api/properties/:id', upload.fields([{ name: 'images', maxCount: 10 }]
     const saved = writeDataFile(PROPERTIES_DATA_FILE, properties);
     
     if (saved) {
-      console.log(`הנכס עודכן בהצלחה דרך POST`);
+      console.log(`הנכס עודכן בהצלחה`);
       res.json({ success: true, message: 'הנכס עודכן בהצלחה', property: updatedProperty });
     } else {
       console.error(`שגיאה בשמירת הנכס המעודכן`);
       res.status(500).json({ success: false, error: 'שגיאה בשמירת הנכס' });
     }
   } catch (error) {
-    console.error(`שגיאה בעדכון נכס (POST):`, error);
+    console.error(`שגיאה בעדכון נכס:`, error);
     res.status(500).json({ success: false, error: 'שגיאה בעדכון הנכס', details: error.message });
   }
 });
@@ -663,6 +739,88 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 // האזנה לפורט
+// נקודת קצה להעלאת תמונות
+app.post('/api/upload-images', upload.array('images', 10), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, error: 'לא הועלו קבצים' });
+    }
+    
+    const fileUrls = req.files.map(file => '/uploads/' + file.filename);
+    console.log('קבצים שהועלו בהצלחה:', fileUrls);
+    
+    res.json({ 
+      success: true, 
+      message: 'הקבצים הועלו בהצלחה',
+      files: fileUrls
+    });
+  } catch (error) {
+    console.error('שגיאה בהעלאת קבצים:', error);
+    res.status(500).json({ success: false, error: 'שגיאה בהעלאת הקבצים' });
+  }
+});
+
+// עדכון נכס קיים
+app.put('/api/properties/:id', (req, res) => {
+  try {
+    const propertyId = parseInt(req.params.id);
+    const properties = JSON.parse(fs.readFileSync(propertiesPath, 'utf8'));
+    const propertyIndex = properties.findIndex(p => p.id === propertyId);
+    
+    if (propertyIndex === -1) {
+      return res.status(404).json({ success: false, error: 'הנכס לא נמצא' });
+    }
+    
+    // עדכון שדות הנכס
+    const updatedProperty = { ...properties[propertyIndex] };
+    
+    // עדכון שדות רגילים
+    const fields = ['title', 'description', 'price', 'address', 'city', 'bedrooms', 'bathrooms', 'area', 'type', 'status'];
+    fields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updatedProperty[field] = req.body[field];
+      }
+    });
+    
+    // עדכון תכונות
+    if (req.body.features) {
+      try {
+        updatedProperty.features = JSON.parse(req.body.features);
+      } catch (e) {
+        console.error('שגיאה בפענוח תכונות:', e);
+        updatedProperty.features = [];
+      }
+    }
+    
+    // עדכון תמונות
+    if (req.body.keepExistingImages === 'false' && req.body.newImages) {
+      try {
+        // שימוש בתמונות החדשות בלבד
+        updatedProperty.images = JSON.parse(req.body.newImages);
+      } catch (e) {
+        console.error('שגיאה בפענוח תמונות חדשות:', e);
+      }
+    } else if (req.body.keepExistingImages === 'true' && req.body.newImages) {
+      try {
+        // הוספת תמונות חדשות לקיימות
+        const newImages = JSON.parse(req.body.newImages);
+        updatedProperty.images = [...(updatedProperty.images || []), ...newImages];
+      } catch (e) {
+        console.error('שגיאה בהוספת תמונות חדשות:', e);
+      }
+    }
+    
+    // שמירת השינויים
+    properties[propertyIndex] = updatedProperty;
+    fs.writeFileSync(propertiesPath, JSON.stringify(properties, null, 2));
+    
+    res.json({ success: true, property: updatedProperty });
+  } catch (error) {
+    console.error('שגיאה בעדכון הנכס:', error);
+    res.status(500).json({ success: false, error: 'אירעה שגיאה בעדכון הנכס' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`השרת רץ בפורט ${port}`);
 });

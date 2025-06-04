@@ -491,72 +491,171 @@ document.addEventListener('DOMContentLoaded', function() {
         addPropertyForm.parentNode.replaceChild(newForm, addPropertyForm);
         
         // הוספת מאזין חדש
-        newForm.addEventListener('submit', function(e) {
+        newForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             console.log('שליחת טופס נכס');
             
-            // יצירת אובייקט FormData חדש
-            const formData = new FormData();
+            const formData = new FormData(newForm);
             const mainImageInput = document.getElementById('property-main-image');
             const additionalImagesInput = document.getElementById('property-additional-images');
+            const submitButton = newForm.querySelector('button[type="submit"]');
             let hasNewImages = false;
             let uploadedImageUrls = [];
             
-            // העלאת תמונות אם יש חדשות
-            const uploadPromises = [];
-            
-            // טיפול בתמונות ראשיות חדשות
-            if (mainImageInput && mainImageInput.files.length > 0) {
-                hasNewImages = true;
-                const uploadFormData = new FormData();
-                for (let i = 0; i < mainImageInput.files.length; i++) {
-                    uploadFormData.append('images', mainImageInput.files[i]);
+            try {
+                // השבתת כפתור השליחה למניעת לחיצות כפולות
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'שומר...';
                 }
                 
-                uploadPromises.push(
-                    fetch('/api/upload-images', {
-                        method: 'POST',
-                        body: uploadFormData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.files) {
-                            uploadedImageUrls = [...uploadedImageUrls, ...data.files];
-                        }
-                    })
-                );
-            }
-            
-            // טיפול בתמונות נוספות חדשות
-            if (additionalImagesInput && additionalImagesInput.files.length > 0) {
-                hasNewImages = true;
-                const uploadFormData = new FormData();
-                for (let i = 0; i < additionalImagesInput.files.length; i++) {
-                    uploadFormData.append('images', additionalImagesInput.files[i]);
+                // העלאת תמונות אם יש חדשות
+                const uploadPromises = [];
+                
+                // טיפול בתמונות ראשיות חדשות
+                if (mainImageInput && mainImageInput.files.length > 0) {
+                    hasNewImages = true;
+                    const uploadFormData = new FormData();
+                    for (let i = 0; i < mainImageInput.files.length; i++) {
+                        uploadFormData.append('images', mainImageInput.files[i]);
+                    }
+                    
+                    uploadPromises.push(
+                        fetch('/api/upload-images', {
+                            method: 'POST',
+                            body: uploadFormData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('שגיאה בהעלאת קבצים');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success && data.files) {
+                                console.log('קבצים שהועלו בהצלחה:', data.files);
+                                return data.files;
+                            }
+                            return [];
+                        })
+                    );
                 }
                 
-                uploadPromises.push(
-                    fetch('/api/upload-images', {
-                        method: 'POST',
-                        body: uploadFormData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.files) {
-                            uploadedImageUrls = [...uploadedImageUrls, ...data.files];
-                        }
-                    })
-                );
+                // טיפול בתמונות נוספות חדשות
+                if (additionalImagesInput && additionalImagesInput.files.length > 0) {
+                    hasNewImages = true;
+                    const uploadFormData = new FormData();
+                    for (let i = 0; i < additionalImagesInput.files.length; i++) {
+                        uploadFormData.append('images', additionalImagesInput.files[i]);
+                    }
+                    
+                    uploadPromises.push(
+                        fetch('/api/upload-images', {
+                            method: 'POST',
+                            body: uploadFormData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('שגיאה בהעלאת קבצים');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success && data.files) {
+                                console.log('קבצים נוספים שהועלו בהצלחה:', data.files);
+                                return data.files;
+                            }
+                            return [];
+                        })
+                    );
+                }
+                
+                // אם יש קבצים להעלות, מחכים לסיום ההעלאה
+                if (uploadPromises.length > 0) {
+                    console.log('מתחיל להעלות קבצים...');
+                    const uploadedFilesArrays = await Promise.all(uploadPromises);
+                    
+                    // שטוח את מערך המערכים למערך אחד
+                    uploadedImageUrls = [].concat(...uploadedFilesArrays.filter(Boolean));
+                    console.log('כל הקבצים שהועלו:', uploadedImageUrls);
+                    
+                    // עדכון כתובות התמונות בטופס
+                    if (uploadedImageUrls.length > 0) {
+                        formData.set('images', JSON.stringify(uploadedImageUrls));
+                    }
+                }
+
+                // המשך שליחת הטופס עם הנתונים המעודכנים
+                const propertyId = document.getElementById('property-id')?.value;
+                const method = propertyId ? 'PUT' : 'POST';
+                const url = propertyId ? `/api/properties/${propertyId}` : '/api/properties';
+
+                // הוספת הודעת טעינה
+                const loadingMessage = document.createElement('div');
+                loadingMessage.textContent = 'שומר את השינויים...';
+                loadingMessage.style.marginTop = '10px';
+                submitButton.parentNode.appendChild(loadingMessage);
+
+                // שליחת הבקשה לשרת
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'אירעה שגיאה בשמירת הנכס');
+                }
+
+                const data = await response.json();
+                console.log('תגובת שרת:', data);
+
+                if (data.success) {
+                    alert('הנכס נשמר בהצלחה!');
+                    
+                    // טעינה מחדש של רשימת הנכסים
+                    await loadProperties();
+                    
+                    // איפוס הטופס
+                    newForm.reset();
+                    
+                    // הסתרת הטופס והצגת הטבלה
+                    document.getElementById('addPropertyForm').style.display = 'none';
+                    document.getElementById('propertiesTable').style.display = 'table';
+                    
+                    // עדכון תצוגת התמונות
+                    if (data.property) {
+                        updateImagePreviews(data.property);
+                    }
+                } else {
+                    throw new Error(data.error || 'אירעה שגיאה בשמירת הנכס');
+                }
+            } catch (error) {
+                console.error('שגיאה בשמירת הנכס:', error);
+                alert('אירעה שגיאה בשמירת הנכס: ' + error.message);
+            } finally {
+                // החזרת כפתור השליחה למצב רגיל
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'שמור נכס';
+                    
+                    // הסרת הודעת הטעינה אם קיימת
+                    const loadingMessage = submitButton.parentNode.querySelector('div');
+                    if (loadingMessage) {
+                        loadingMessage.remove();
+                    }
+                }
             }
-            
-            // המתן להשלמת העלאת כל הקבצים
-            Promise.all(uploadPromises)
-                .then(() => {
+                    const mainImage = uploadedImageUrls[0] || '';
+                    if (mainImage) {
+                        document.getElementById('property-image').value = mainImage;
+                    }
+                    
                     // יצירת אובייקט FormData חדש
                     const formData = new FormData();
                     
                     // הוספת כל שדות הטופס
-                    const formElements = this.elements;
+                    const formElements = newForm.elements;
                     for (let i = 0; i < formElements.length; i++) {
                         const element = formElements[i];
                         if (element.name && element.name !== 'images' && element.name !== 'features[]' && element.type !== 'file') {
@@ -609,36 +708,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     console.log('תגובת שרת:', response.status);
-                    if (!response.ok) {
-                        throw new Error('שגיאה בתגובת השרת');
-                    }
-                    return response.json();
+                    // ננסה לפרק את התגובה כ-JSON
+                    return response.json().then(data => {
+                        if (!response.ok) {
+                            console.error('שגיאה בשרת:', data);
+                            throw new Error(data.error || 'שגיאה לא ידועה');
+                        }
+                        return data;
+                    }).catch(err => {
+                        // אם יש בעיה בפענוח ה-JSON, נזרוק שגיאה עם הטקסט המקורי
+                        if (!response.ok) {
+                            console.error('שגיאה בפענוח תגובת השרת:', err);
+                            throw new Error('שגיאה בשרת - תשובה לא תקינה');
+                        }
+                        throw err;
+                    });
                 })
                 .then(data => {
                     console.log('תגובת שרת JSON:', data);
                     
-                    if (data.success) {
-                        alert('הנכס נשמר בהצלחה!');
+                    // אם הגענו לכאן, הפעולה הצליחה
+                    alert('הנכס נשמר בהצלחה!');
+                    
+                    // עדכון רשימת הנכסים
+                    console.log('טוען מחדש את רשימת הנכסים...');
+                    return loadProperties().then(() => {
+                        console.log('רשימת הנכסים נטענה מחדש');
+                        // איפוס הטופס
+                        document.getElementById('addPropertyForm').reset();
                         
-                        // עדכון רשימת הנכסים
-                        console.log('טוען מחדש את רשימת הנכסים...');
-                        loadProperties().then(() => {
-                            console.log('רשימת הנכסים נטענה מחדש');
-                            // איפוס הטופס
-                            document.getElementById('addPropertyForm').reset();
-                            
-                            // עדכון תצוגת התמונות
-                            updateImagePreviews(data.property);
-                            
-                            // מעבר לכרטיסיית הנכסים
-                            const propertiesTab = document.getElementById('properties-tab');
-                            if (propertiesTab) {
-                                propertiesTab.click();
-                            }
-                        });
-                    } else {
-                        throw new Error(data.error || 'אירעה שגיאה בשמירת הנכס');
-                    }
+                        // עדכון תצוגת התמונות
+                        updateImagePreviews(data.property);
+                        
+                        // מעבר לכרטיסיית הנכסים
+                        const propertiesTab = document.getElementById('properties-tab');
+                        if (propertiesTab) {
+                            propertiesTab.click();
+                        }
+                        
+                        // החזרת הנתונים המעודכנים
+                        return data;
+                    });
                 })
                 .catch(error => {
                     console.error('שגיאה בשליחת הנכס:', error);

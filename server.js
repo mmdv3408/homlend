@@ -131,20 +131,33 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Middleware to check if user is authenticated
+function checkAuth(req, res, next) {
+  if (req.cookies && req.cookies.adminAuth) {
+    // User is authenticated, continue to the next middleware
+    next();
+  } else {
+    // User is not authenticated, redirect to login with error message
+    res.redirect('/admin/login?error=not_authenticated');
+  }
+}
+
 // הגדרת נתיבים לדפי admin
-app.get('/admin', (req, res) => {
+app.get('/admin', checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin/index.html'));
 });
 
+// Serve login page
 app.get('/admin/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin/login.html'));
 });
 
-app.get('/admin/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin/index.html'));
-});
-
+// Serve login page directly
 app.get('/admin/login.html', (req, res) => {
+  // If user is already logged in, redirect to admin
+  if (req.cookies && req.cookies.adminAuth) {
+    return res.redirect('/admin');
+  }
   res.sendFile(path.join(__dirname, 'admin/login.html'));
 });
 

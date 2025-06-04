@@ -1,17 +1,12 @@
 {
-  // Format on save
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-
-  // File associations
   "files.associations": {
     "*.js": "javascript"
   },
-
-  // Editor settings
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
@@ -25,15 +20,11 @@
   "editor.autoClosingBrackets": "always",
   "editor.autoClosingQuotes": "always",
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
-
-  // ESLint settings
   "eslint.validate": ["javascript", "javascriptreact"],
   "eslint.format.enable": true,
   "eslint.packageManager": "npm",
   "eslint.run": "onType",
   "eslint.workingDirectories": [{"mode": "auto"}],
-
-  // Prettier settings
   "prettier.singleQuote": true,
   "prettier.trailingComma": "es5",
   "prettier.printWidth": 100,
@@ -67,8 +58,6 @@
       }
     }
   ],
-
-  // File exclusions
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -81,8 +70,6 @@
     "**/build": true,
     "**/coverage": true
   },
-
-  // Search settings
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
@@ -91,8 +78,6 @@
     "**/coverage": true,
     "**/.git": true
   },
-
-  // Workbench settings
   "workbench.colorTheme": "Default Dark+",
   "workbench.iconTheme": "vs-seti",
   "workbench.startupEditor": "welcomePage",

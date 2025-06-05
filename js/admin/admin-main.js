@@ -7,8 +7,8 @@ import { initImages } from './admin-images.js';
 import { initDashboard } from './admin-dashboard.js';
 
 // משתנים גלובליים
-export let propertiesData = [];
-export let agentsData = [];
+let propertiesData = [];
+let agentsData = [];
 
 // פונקציה לאתחול המערכת
 async function initAdmin() {

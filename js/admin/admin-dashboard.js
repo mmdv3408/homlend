@@ -48,4 +48,9 @@ function updateActivity(activities) {
             <span class="activity-text">${activity.text}</span>
         </li>
     `).join('');
+}
+
+// פונקציה לאתחול לוח הבקרה
+export async function initDashboard() {
+    await loadDashboardData();
 } 

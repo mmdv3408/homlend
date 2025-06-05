@@ -428,36 +428,7 @@
         </div>
     </div>
 
-    <!-- Load the main admin script as a module -->
-    <script type="module" id="main-script">
-        // Display a console message about the new modular structure
-        console.log('המערכת עברה למבנה מודולרי חדש. טוען מודולים...');
-        
-        // Import the initAdmin function
-        import { initAdmin } from '../js/admin/admin-main.js';
-        
-        // Initialize the admin panel
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded, initializing admin...');
-            initAdmin().catch(error => {
-                console.error('שגיאה באתחול האפליקציה:', error);
-                const loadingIndicator = document.getElementById('loading-indicator');
-                if (loadingIndicator) loadingIndicator.style.display = 'none';
-            });
-        });
-        
-        // Global error handler
-        window.addEventListener('error', (event) => {
-            console.error('שגיאה כללית באפליקציה:', event.error);
-            const loadingIndicator = document.getElementById('loading-indicator');
-            if (loadingIndicator) loadingIndicator.style.display = 'none';
-        });
-    </script>
-    
     <!-- Add some basic loading styles -->
-    <!-- ייבוא המודולים של הפאנל הניהולי -->
-    <script type="module" src="js/admin-main.js"></script>
-    
     <style>
         @keyframes spin {
             0% { transform: rotate(0deg); }

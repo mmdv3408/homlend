@@ -2,7 +2,7 @@
 import { initAuth } from './admin-auth.js';
 import { initUI } from './admin-ui.js';
 import { initProperties } from './admin-properties.js';
-import { initAgents } from './admin-agents.js';
+// import { initAgents } from './admin-agents.js'; // הוסר כי אין פונקציה כזו
 import { initImages } from './admin-images.js';
 import { initDashboard } from './admin-dashboard.js';
 
@@ -19,7 +19,7 @@ async function initAdmin() {
         await initAuth();
         await initUI();
         await initProperties();
-        await initAgents();
+        // await initAgents(); // הוסר כי אין פונקציה כזו
         await initImages();
         await initDashboard();
         
@@ -37,4 +37,6 @@ async function initAdmin() {
 }
 
 // אתחול המערכת כשהדף נטען
-document.addEventListener('DOMContentLoaded', initAdmin); 
+document.addEventListener('DOMContentLoaded', initAdmin);
+
+export { propertiesData, agentsData, initAdmin }; 

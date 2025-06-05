@@ -24,3 +24,5 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = '/admin/login.html';
         });
 });
+
+// קובץ זה הועבר ל-dev-tools. אין להפעיל בפרודקשן.

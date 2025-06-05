@@ -13,13 +13,6 @@ export const propertiesData = [];
 export const agentsData = [];
 
 // פונקציות עזר
-export function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return '';
-}
-
 // פונקציה לטעינת נתונים ראשונית
 async function loadInitialData() {
   try {
@@ -160,7 +153,7 @@ if (document.readyState === 'loading') {
 }
 
 // ייצוא משתנים ופונקציות לשימוש במודולים אחרים
-export { propertiesData, agentsData, getCookie, initAdmin };
+export { propertiesData, agentsData, initAdmin };
 
 // Debug: Log that the module was loaded
 console.log('admin-main.js module loaded successfully');

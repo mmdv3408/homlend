@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>התחברות - הום-לנד נכסים</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -228,7 +228,7 @@
             <!-- צד ימין עם לוגו וכותרת -->
             <div class="login-side logo-side">
                 <div class="logo-container">
-                    <img src="../images/logo.png" alt="הום-לנד נכסים" class="logo-img">
+                    <img src="/images/logo.png" alt="הום-לנד נכסים" class="logo-img">
                 </div>
                 <h2>מערכת ניהול נכסים</h2>
                 <p class="welcome-text">ברוכים הבאים למערכת הניהול של הום-לנד נכסים</p>
@@ -257,68 +257,193 @@
         </div>
     </div>
 
+    <div id="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
-            const loginMessage = document.getElementById('loginMessage');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            const loginButton = document.querySelector('button[type="submit"]');
+            const originalButtonText = loginButton.innerHTML;
             
-            // בדיקה אם המשתמש כבר מחובר
-            fetch('/api/auth/status')
-                .then(response => response.json())
-                .then(data => {
+            // Check URL for error/success messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorParam = urlParams.get('error');
+            const loggedOut = urlParams.get('logged_out');
+            const returnTo = urlParams.get('returnTo') || '/admin';
+            
+            // Display appropriate messages based on URL parameters
+            if (errorParam) {
+                const errorMessages = {
+                    'session_expired': 'הסשן שלך הסתיים. אנא התחבר שוב.',
+                    'unauthorized': 'אין לך הרשאה לגשת לדף זה',
+                    'invalid_credentials': 'שם משתמש או סיסמה שגויים',
+                    'server_error': 'שגיאת שרת. נסה שוב מאוחר יותר.',
+                    'logout_failed': 'ההתנתקות נכשלה. נסה שוב.'
+                };
+                showError(errorMessages[errorParam] || 'אירעה שגיאה בהתחברות');
+            }
+            
+            if (loggedOut === 'true') {
+                showSuccess('התנתקת בהצלחה מהמערכת');
+            }
+            
+            // Check if user is already logged in
+            async function checkSession() {
+                try {
+                    const response = await fetch('/api/auth/check-session', {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache',
+                            'Pragma': 'no-cache'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
                     if (data.authenticated) {
-                        // אם המשתמש כבר מחובר, הפניה לדף הניהול
-                        window.location.href = '/admin';
+                        // If already authenticated, redirect to admin or returnTo URL
+                        window.location.href = decodeURIComponent(returnTo);
                     }
-                });
+                } catch (error) {
+                    console.error('Error checking session:', error);
+                    // Don't show error to user on session check failure
+                } finally {
+                    // Always hide loading indicator when check is complete
+                    document.getElementById('loading-indicator').style.display = 'none';
+                }
+            }
             
-            // טיפול בשליחת טופס ההתחברות
-            loginForm.addEventListener('submit', function(e) {
+            // Check session on page load
+            checkSession();
+            
+            // Handle form submission
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                const username = document.getElementById('username').value;
+                const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value;
                 
-                // הסרת הודעות קודמות
-                loginMessage.className = 'login-message';
-                loginMessage.style.display = 'none';
+                // Reset messages
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
                 
-                // שליחת בקשת התחברות לשרת
-                fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // הקוקיס נשלחו כבר מהשרת
-                        // הצגת הודעת הצלחה
-                        loginMessage.textContent = data.message;
-                        loginMessage.className = 'message success';
-                        loginMessage.style.display = 'block';
-                        
-                        // הפניה לדף הניהול
+                // Basic validation
+                if (!username || !password) {
+                    showError('נא למלא את כל השדות');
+                    document.getElementById(username ? 'password' : 'username').focus();
+                    return;
+                }
+                
+                // Show loading state
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מתחבר...';
+                
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ 
+                            username, 
+                            password,
+                            returnTo: returnTo
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showSuccess('מתחבר...');
+                        // Small delay to show success message before redirect
                         setTimeout(() => {
-                            window.location.href = data.redirect;
+                            window.location.href = data.redirect || decodeURIComponent(returnTo);
                         }, 500);
                     } else {
-                        // התחברות נכשלה
-                        loginMessage.textContent = data.message;
-                        loginMessage.classList.add('error');
-                        loginMessage.style.display = 'block';
+                        // Focus on password field on error
+                        document.getElementById('password').focus();
+                        showError(data.message || 'שם משתמש או סיסמה שגויים');
                     }
-                })
-                .catch(error => {
-                    console.error('שגיאה בהתחברות:', error);
-                    loginMessage.textContent = 'אירעה שגיאה בתהליך ההתחברות. אנא נסה שוב.';
-                    loginMessage.classList.add('error');
-                    loginMessage.style.display = 'block';
-                });
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showError('אירעה שגיאה בחיבור לשרת. נסה שוב מאוחר יותר.');
+                } finally {
+                    // Reset button state
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = originalButtonText;
+                }
             });
+            
+            // Auto-focus username field on load
+            document.getElementById('username').focus();
+            
+            // Show/hide password toggle
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.createElement('span');
+            togglePassword.className = 'password-toggle';
+            togglePassword.innerHTML = '👁️';
+            togglePassword.title = 'הצג/הסתר סיסמה';
+            togglePassword.style.cursor = 'pointer';
+            togglePassword.style.marginRight = '10px';
+            togglePassword.onclick = function() {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                this.innerHTML = type === 'password' ? '👁️' : '👁️‍🗨️';
+            };
+            passwordInput.parentNode.insertBefore(togglePassword, passwordInput.nextSibling);
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                
+                // Add animation
+                errorMessage.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    errorMessage.style.animation = '';
+                }, 500);
+            }
+            
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+            }
         });
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            .password-toggle {
+                user-select: none;
+            }
+            
+            .btn:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

@@ -131,33 +131,20 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Middleware to check if user is authenticated
-function checkAuth(req, res, next) {
-  if (req.cookies && req.cookies.adminAuth) {
-    // User is authenticated, continue to the next middleware
-    next();
-  } else {
-    // User is not authenticated, redirect to login with error message
-    res.redirect('/admin/login?error=not_authenticated');
-  }
-}
-
 // הגדרת נתיבים לדפי admin
-app.get('/admin', checkAuth, (req, res) => {
+app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin/index.html'));
 });
 
-// Serve login page
 app.get('/admin/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin/login.html'));
 });
 
-// Serve login page directly
+app.get('/admin/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin/index.html'));
+});
+
 app.get('/admin/login.html', (req, res) => {
-  // If user is already logged in, redirect to admin
-  if (req.cookies && req.cookies.adminAuth) {
-    return res.redirect('/admin');
-  }
   res.sendFile(path.join(__dirname, 'admin/login.html'));
 });
 
@@ -834,6 +821,30 @@ app.put('/api/properties/:id', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`השרת רץ בפורט ${port}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`השרת רץ בפורט ${PORT}`);
+  
+  // בדיקת הרשאות תיקיות
+  console.log('בדיקת הרשאות תיקיות:');
+  try {
+    require('fs').accessSync('/home/moishi/code/homeland/admin');
+    console.log('- /admin: בסדר');
+  } catch (e) {
+    console.log('- /admin: שגיאה - ', e.message);
+  }
+  
+  try {
+    require('fs').accessSync('/home/moishi/code/homeland/admin/js');
+    console.log('- /admin/js: בסדר');
+  } catch (e) {
+    console.log('- /admin/js: שגיאה - ', e.message);
+  }
+  
+  try {
+    require('fs').accessSync('/home/moishi/code/homeland/uploads');
+    console.log('- /uploads: בסדר');
+  } catch (e) {
+    console.log('- /uploads: שגיאה - ', e.message);
+  }
 });

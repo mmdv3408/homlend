@@ -40,15 +40,23 @@ async function checkLoggedInUser() {
 function setupLogoutButton() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
+    // הסרת מאזיני אירועים קיימים
+    const newLogoutBtn = logoutBtn.cloneNode(true);
+    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+
+    newLogoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       try {
         const response = await fetch('/api/auth/logout', {
           method: 'POST',
-          credentials: 'include'
+          credentials: 'include',
         });
-        if (response.ok) {
+        
+        const data = await response.json();
+        if (data.success) {
           window.location.href = '/admin/login.html';
+        } else {
+          console.error('שגיאה בהתנתקות:', data.error || 'אירעה שגיאה לא צפויה');
         }
       } catch (error) {
         console.error('שגיאה בהתנתקות:', error);

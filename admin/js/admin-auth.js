@@ -1,5 +1,6 @@
 // ניהול אימות משתמשים
-import { getCookie, showError } from './admin-main.js';
+import { getCookie, showError } from './utils.js';
+import { API_URL } from './config.js';
 
 // בדיקת המשתמש המחובר
 async function checkLoggedInUser() {
@@ -12,7 +13,7 @@ async function checkLoggedInUser() {
   
   try {
     console.log('בודק סשן משתמש...');
-    const response = await fetch('/api/auth/check-session', {
+    const response = await fetch(`${API_URL}/api/auth/check-session`, {
       credentials: 'include'
     });
     
@@ -33,35 +34,6 @@ async function checkLoggedInUser() {
     // הפנייה לדף ההתחברות
     window.location.href = '/admin/login.html';
     return false; // לא נמשיך את ההתחברות
-  }
-}
-
-// אתחול כפתור התנתקות
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    // הסרת מאזיני אירועים קיימים
-    const newLogoutBtn = logoutBtn.cloneNode(true);
-    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-
-    newLogoutBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        const response = await fetch('/api/auth/logout', {
-          method: 'POST',
-          credentials: 'include',
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-          window.location.href = '/admin/login.html';
-        } else {
-          console.error('שגיאה בהתנתקות:', data.error || 'אירעה שגיאה לא צפויה');
-        }
-      } catch (error) {
-        console.error('שגיאה בהתנתקות:', error);
-      }
-    });
   }
 }
 
@@ -93,26 +65,43 @@ async function initAuth() {
 // הגדרת כפתור ההתנתקות
 function setupLogoutButton() {
   const logoutBtn = document.getElementById('logoutBtn');
+  
   if (logoutBtn) {
-    // הסרת מאזיני אירועים קיימים
-    const newLogoutBtn = logoutBtn.cloneNode(true);
-    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-
-    newLogoutBtn.addEventListener('click', () => {
-      fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            window.location.href = '/admin/login.html';
+    console.log('2.3.1 Setting up logout button event listener');
+    logoutBtn.addEventListener('click', async () => {
+      console.log('Logging out...');
+      try {
+        const response = await fetch(`${API_URL}/api/auth/logout`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           }
-        })
-        .catch(error => {
-          console.error('שגיאה בהתנתקות:', error);
         });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log('Logout successful, redirecting to login page');
+          window.location.href = '/admin/login.html';
+        } else {
+          console.error('Logout failed:', data.message);
+          alert('שגיאה בהתנתקות: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error during logout:', error);
+        // אם השרת לא זמין, ננסה לנקות את הקוקיס בצד הלקוח
+        document.cookie = 'adminAuth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        
+        alert('שגיאה בהתנתקות. מנתק אותך בכל זאת...');
+        window.location.href = '/admin/login.html';
+      }
     });
+  } else {
+    console.warn('2.3.2 Logout button not found');
   }
 }
 

@@ -140,3 +140,25 @@ export function getUrlParameter(name) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(name);
 }
+
+// פונקציות עזר כלליות
+
+// פונקציה לקבלת ערך קוקי
+export function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// פונקציה לבדיקת תקינות קובץ תמונה
+export function isValidImageFile(file) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    return validTypes.includes(file.type);
+}
+
+// פונקציה לבדיקת גודל קובץ
+export function isValidFileSize(file, maxSizeMB = 10) {
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    return file.size <= maxSizeBytes;
+} 

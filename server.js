@@ -725,6 +725,27 @@ app.get('/api/auth/status', (req, res) => {
   }
 });
 
+// בדיקת סשן (לבקשת API מהלקוח)
+app.get('/api/auth/check-session', (req, res) => {
+  // בדיקה אם יש קוקי של אימות - זהה ל-status
+  if (req.cookies && req.cookies.adminAuth) {
+    // המשתמש מחובר
+    res.json({
+      authenticated: true,
+      user: {
+        username: req.cookies.username,
+        name: req.cookies.name
+      }
+    });
+  } else {
+    // המשתמש לא מחובר
+    res.status(401).json({
+      authenticated: false,
+      message: 'המשתמש לא מחובר'
+    });
+  }
+});
+
 // התנתקות מהמערכת
 app.post('/api/auth/logout', (req, res) => {
   // מחיקת הקוקיס

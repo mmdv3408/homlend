@@ -75,46 +75,56 @@ function setupImageUploadPreview() {
 
 // פונקציה לעדכון תצוגת התמונות מנתוני נכס
 function updateImagePreviews(property) {
-    if (!property) return;
-    
-    // עדכון תמונה ראשית
-    const mainPreview = document.getElementById('main-image-preview');
-    if (mainPreview && property.mainImage) {
-        mainPreview.innerHTML = `
-            <div class="image-preview-item main-image">
-                <img src="${property.mainImage}" alt="תמונה ראשית" onerror="this.src='../images/placeholder.jpg';">
-                <div class="image-actions">
-                    <button type="button" class="remove-image" data-target="main"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            </div>
-        `;
-    } else if (mainPreview) {
-        mainPreview.innerHTML = '<div class="no-image">לא נמצאה תמונה ראשית</div>';
+    if (!property) {
+        console.warn('לא התקבל אובייקט נכס תקין');
+        return;
     }
     
-    // עדכון תמונות נוספות
-    const additionalPreview = document.getElementById('additional-images-preview');
-    if (additionalPreview && property.additionalImages && Array.isArray(property.additionalImages)) {
-        additionalPreview.innerHTML = ''; // ניקוי תמונות קודמות
-        
-        property.additionalImages.forEach((image, index) => {
-            const imageItem = document.createElement('div');
-            imageItem.className = 'image-preview-item';
-            imageItem.innerHTML = `
-                <img src="${image}" alt="תמונה נוספת ${index + 1}" onerror="this.src='../images/placeholder.jpg';">
-                <div class="image-actions">
-                    <button type="button" class="remove-image" data-url="${image}"><i class="fas fa-trash-alt"></i></button>
+    try {
+        // עדכון תמונה ראשית
+        const mainPreview = document.getElementById('main-image-preview');
+        if (mainPreview && property.mainImage) {
+            mainPreview.innerHTML = `
+                <div class="image-preview-item main-image">
+                    <img src="${property.mainImage}" alt="תמונה ראשית" onerror="this.src='../images/placeholder.jpg';">
+                    <div class="image-actions">
+                        <button type="button" class="remove-image" data-target="main"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </div>
             `;
+        } else if (mainPreview) {
+            mainPreview.innerHTML = '<div class="no-image">לא נמצאה תמונה ראשית</div>';
+        }
+        
+        // עדכון תמונות נוספות
+        const additionalPreview = document.getElementById('additional-images-preview');
+        if (additionalPreview && property.additionalImages && Array.isArray(property.additionalImages)) {
+            additionalPreview.innerHTML = ''; // ניקוי תמונות קודמות
             
-            additionalPreview.appendChild(imageItem);
-        });
-    } else if (additionalPreview) {
-        additionalPreview.innerHTML = ''; // ניקוי תצוגה אם אין תמונות
+            property.additionalImages.forEach((image, index) => {
+                if (!image) return;
+                
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-preview-item';
+                imageItem.innerHTML = `
+                    <img src="${image}" alt="תמונה נוספת ${index + 1}" onerror="this.src='../images/placeholder.jpg';">
+                    <div class="image-actions">
+                        <button type="button" class="remove-image" data-url="${image}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                
+                additionalPreview.appendChild(imageItem);
+            });
+        } else if (additionalPreview) {
+            additionalPreview.innerHTML = ''; // ניקוי תצוגה אם אין תמונות
+        }
+        
+        // הוספת אירועים לכפתורי הסרה
+        addRemoveImageListeners();
+        
+    } catch (error) {
+        console.error('שגיאה בעדכון תצוגת התמונות:', error);
     }
-    
-    // הוספת אירועים לכפתורי הסרה
-    addRemoveImageListeners();
 }
 
 // פונקציה להוספת מאזיני אירועים לכפתורי הסרת תמונות

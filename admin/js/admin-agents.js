@@ -1,5 +1,6 @@
 // ניהול סוכנים
 import { showError, showSuccess, formatDate } from './utils.js';
+import config from './config.js';
 
 // פונקציה לאתחול מודול הסוכנים
 export async function initAgents() {
@@ -22,7 +23,7 @@ export async function initAgents() {
 // פונקציה לטעינת סוכנים
 export async function loadAgents() {
     try {
-        const response = await fetch('/api/agents');
+        const response = await fetch(`${config.apiUrl}/api/agents`);
         const data = await response.json();
         
         if (!data.success) {
@@ -86,7 +87,7 @@ export function setupAgentForm() {
             const formData = new FormData(form);
             const agentId = formData.get('id');
             
-            const response = await fetch(`/api/agents${agentId ? `/${agentId}` : ''}`, {
+            const response = await fetch(`${config.apiUrl}/api/agents${agentId ? `/${agentId}` : ''}`, {
                 method: agentId ? 'PUT' : 'POST',
                 body: formData
             });
@@ -111,7 +112,7 @@ export function setupAgentForm() {
 // פונקציה לעריכת סוכן
 export async function editAgent(id) {
     try {
-        const response = await fetch(`/api/agents/${id}`);
+        const response = await fetch(`${config.apiUrl}/api/agents/${id}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -147,7 +148,7 @@ export async function deleteAgent(id) {
     }
     
     try {
-        const response = await fetch(`/api/agents/${id}`, {
+        const response = await fetch(`${config.apiUrl}/api/agents/${id}`, {
             method: 'DELETE'
         });
         

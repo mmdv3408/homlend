@@ -1,5 +1,6 @@
 // ניהול אימות משתמשים
 import { getCookie, showError } from './utils.js';
+import config from './config.js';
 
 // בדיקת המשתמש המחובר
 async function checkLoggedInUser() {
@@ -13,7 +14,7 @@ async function checkLoggedInUser() {
   
   try {
     console.log('בודק סשן משתמש...');
-    const response = await fetch('/api/auth/check-session', {
+    const response = await fetch(`${config.apiUrl}/api/auth/check-session`, {
       credentials: 'include'
     });
     
@@ -71,7 +72,7 @@ function setupLogoutButton() {
     logoutBtn.addEventListener('click', async () => {
       console.log('Logging out...');
       try {
-        const response = await fetch('/api/auth/logout', {
+        const response = await fetch(`${config.apiUrl}/api/auth/logout`, {
           method: 'POST',
           credentials: 'include',
           headers: {

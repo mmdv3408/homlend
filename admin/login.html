@@ -293,6 +293,17 @@
             // Check if user is already logged in
             async function checkSession() {
                 try {
+                    // בדיקה אם המשתמש הגיע מדף האדמין עקב שגיאת אימות
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const errorSource = urlParams.get('error_source');
+                    
+                    // אם הגענו מדף האדמין עם שגיאה, לא נבצע הפנייה אוטומטית בחזרה
+                    if (errorSource === 'admin') {
+                        console.log('נמצא בדף הלוגין עקב הפנייה משגיאת אימות באדמין. מבטל הפנייה אוטומטית חזרה');
+                        document.getElementById('loading-indicator').style.display = 'none';
+                        return; // לא ממשיך לבדיקת סשן אוטומטית
+                    }
+                    
                     const response = await fetch('/api/auth/check-session', {
                         method: 'GET',
                         credentials: 'include',
@@ -307,7 +318,7 @@
                     
                     if (data.authenticated) {
                         // If already authenticated, redirect to admin or returnTo URL
-                            window.location.href = decodeURIComponent(returnTo);
+                        window.location.href = decodeURIComponent(returnTo);
                     }
                 } catch (error) {
                     console.error('Error checking session:', error);

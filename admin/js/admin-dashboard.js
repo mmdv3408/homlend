@@ -1,11 +1,12 @@
 // ניהול לוח הבקרה
 import { showError, formatPrice, formatDate } from './utils.js';
+import config from './config.js';
 
 // פונקציה לטעינת נתוני לוח הבקרה
 export async function loadDashboardData() {
     try {
         // טעינת סטטיסטיקות
-        const statsResponse = await fetch('/api/dashboard/stats');
+        const statsResponse = await fetch(`${config.apiUrl}/api/dashboard/stats`);
         const statsData = await statsResponse.json();
         
         if (statsData.success) {
@@ -13,7 +14,7 @@ export async function loadDashboardData() {
         }
         
         // טעינת פעילות אחרונה
-        const activityResponse = await fetch('/api/dashboard/activity');
+        const activityResponse = await fetch(`${config.apiUrl}/api/dashboard/activity`);
         const activityData = await activityResponse.json();
         
         if (activityData.success) {

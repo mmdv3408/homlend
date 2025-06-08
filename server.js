@@ -123,6 +123,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 // הוספת תמיכה בקוקיס
 app.use(cookieParser());
 
+// הוסף את השורות האלו מהמיקום הנוכחי לסוף הקובץ, ממש לפני app.listen
 app.use(express.static(path.join(__dirname)));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -681,10 +682,19 @@ app.post('/api/auth/login', (req, res) => {
   const user = users.find(u => u.username === username && u.password === password);
   
   if (user) {
-    // התחברות הצליחה - יצירת קוקי
-    res.cookie('adminAuth', true, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true }); // קוקי ל-24 שעות
-    res.cookie('username', user.username, { maxAge: 24 * 60 * 60 * 1000 });
-    res.cookie('name', user.name, { maxAge: 24 * 60 * 60 * 1000 });
+    // התחברות הצליחה - יצירת קוקי עם הגדרות משופרות
+    const cookieOptions = {
+      maxAge: 24 * 60 * 60 * 1000, // קוקי ל-24 שעות
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production', // secure בסביבת פרודקשן
+    };
+    
+    // הגדרת קוקי אימות עם ערך משמעותי לזיהוי קל
+    res.cookie('adminAuth', 'authenticated-' + Date.now(), cookieOptions);
+    res.cookie('username', user.username, cookieOptions);
+    res.cookie('name', user.name, cookieOptions);
     
     // שליחת תשובה חיובית
     res.json({
@@ -696,6 +706,8 @@ app.post('/api/auth/login', (req, res) => {
         name: user.name
       }
     });
+    
+    console.log('התחברות הצליחה:', user.username, '- קוקי נוצרו');
   } else {
     // התחברות נכשלה
     res.status(401).json({
@@ -708,8 +720,9 @@ app.post('/api/auth/login', (req, res) => {
 // בדיקת סטטוס התחברות
 app.get('/api/auth/status', (req, res) => {
   // בדיקה אם יש קוקי של אימות
-  if (req.cookies && req.cookies.adminAuth) {
+  if (req.cookies && req.cookies.adminAuth && req.cookies.adminAuth.startsWith('authenticated-')) {
     // המשתמש מחובר
+    console.log('בדיקת סטטוס: משתמש מחובר -', req.cookies.username);
     res.json({
       authenticated: true,
       user: {
@@ -719,6 +732,7 @@ app.get('/api/auth/status', (req, res) => {
     });
   } else {
     // המשתמש לא מחובר
+    console.log('בדיקת סטטוס: משתמש לא מחובר');
     res.json({
       authenticated: false
     });
@@ -727,9 +741,12 @@ app.get('/api/auth/status', (req, res) => {
 
 // בדיקת סשן (לבקשת API מהלקוח)
 app.get('/api/auth/check-session', (req, res) => {
-  // בדיקה אם יש קוקי של אימות - זהה ל-status
-  if (req.cookies && req.cookies.adminAuth) {
+  console.log('בדיקת סשן מתבצעת, קוקי:', req.cookies && req.cookies.adminAuth ? req.cookies.adminAuth.substring(0, 20) + '...' : 'אין קוקי');
+  
+  // בדיקה אם יש קוקי של אימות בתבנית החדשה
+  if (req.cookies && req.cookies.adminAuth && req.cookies.adminAuth.startsWith('authenticated-')) {
     // המשתמש מחובר
+    console.log('בדיקת סשן: משתמש מאומת -', req.cookies.username);
     res.json({
       authenticated: true,
       user: {
@@ -739,6 +756,7 @@ app.get('/api/auth/check-session', (req, res) => {
     });
   } else {
     // המשתמש לא מחובר
+    console.log('בדיקת סשן: משתמש לא מאומת');
     res.status(401).json({
       authenticated: false,
       message: 'המשתמש לא מחובר'

@@ -46,7 +46,7 @@ async function initAuth() {
     
     if (!isAuthenticated) {
       console.log('2.2 User not authenticated, redirecting to login...');
-      window.location.href = './login.html';
+      window.location.href = './login.html?error_source=admin';
       return false;
     }
     
@@ -57,7 +57,7 @@ async function initAuth() {
   } catch (error) {
     console.error('2.4 Error in initAuth:', error);
     console.log('2.5 Redirecting to login page due to error...');
-    window.location.href = './login.html';
+    window.location.href = './login.html?error_source=admin';
     return false;
   }
 }

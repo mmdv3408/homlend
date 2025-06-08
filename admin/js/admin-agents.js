@@ -1,6 +1,24 @@
 // ניהול סוכנים
 import { showError, showSuccess, formatDate } from './utils.js';
 
+// פונקציה לאתחול מודול הסוכנים
+export async function initAgents() {
+    console.log('אתחול מודול הסוכנים...');
+    try {
+        // הגדרת טופס סוכן
+        setupAgentForm();
+        
+        // טעינת רשימת סוכנים
+        await loadAgents();
+        
+        console.log('מודול הסוכנים אותחל בהצלחה');
+        return true;
+    } catch (error) {
+        console.error('שגיאה באתחול מודול הסוכנים:', error);
+        return false;
+    }
+}
+
 // פונקציה לטעינת סוכנים
 export async function loadAgents() {
     try {
@@ -25,13 +43,27 @@ export async function loadAgents() {
                 <td>${agent.properties || 0}</td>
                 <td>${formatDate(agent.joinDate)}</td>
                 <td>
-                    <button class="btn-edit" onclick="editAgent('${agent.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" onclick="deleteAgent('${agent.id}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn-edit" data-id="${agent.id}"><i class="fas fa-edit"></i></button>
+                    <button class="btn-delete" data-id="${agent.id}"><i class="fas fa-trash"></i></button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
         
+        // הוספת מאזיני אירועים לכפתורים
+        document.querySelectorAll('.btn-edit').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                editAgent(id);
+            });
+        });
+        
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                deleteAgent(id);
+            });
+        });
     } catch (error) {
         console.error('שגיאה בטעינת סוכנים:', error);
         showError('אירעה שגיאה בטעינת הסוכנים');
@@ -79,7 +111,7 @@ export function setupAgentForm() {
 // פונקציה לעריכת סוכן
 export async function editAgent(id) {
     try {
-        const response = await fetch(`../api/agents/${id}`);
+        const response = await fetch(`/api/agents/${id}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -115,7 +147,7 @@ export async function deleteAgent(id) {
     }
     
     try {
-        const response = await fetch(`../api/agents/${id}`, {
+        const response = await fetch(`/api/agents/${id}`, {
             method: 'DELETE'
         });
         

@@ -51,10 +51,16 @@ async function handleMainImageUpload(event) {
             reader.onload = e => {
                 preview.innerHTML = `
                     <img src="${e.target.result}" alt="תמונה ראשית">
-                    <button type="button" class="remove-image" onclick="removeMainImage()">
+                    <button type="button" class="remove-image" data-type="main">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
+                
+                // הוספת מאזין אירוע לכפתור הסרת תמונה ראשית
+                const removeBtn = preview.querySelector('.remove-image');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', removeMainImage);
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -93,7 +99,7 @@ async function handleAdditionalImagesUpload(event) {
                         resolve(`
                             <div class="image-preview-item">
                                 <img src="${e.target.result}" alt="תמונה נוספת">
-                                <button type="button" class="remove-image" onclick="removeAdditionalImage(${preview.children.length})">
+                                <button type="button" class="remove-image" data-index="${preview.children.length}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -104,6 +110,15 @@ async function handleAdditionalImagesUpload(event) {
             }));
             
             preview.innerHTML += previewItems.join('');
+            
+            // הוספת מאזיני אירועים לכפתורי הסרת תמונות נוספות
+            const removeButtons = preview.querySelectorAll('.remove-image');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    removeAdditionalImage(index);
+                });
+            });
         }
         
     } catch (error) {

@@ -307,7 +307,7 @@
                     
                     if (data.authenticated) {
                         // If already authenticated, redirect to admin or returnTo URL
-                        window.location.href = decodeURIComponent(returnTo);
+                            window.location.href = decodeURIComponent(returnTo);
                     }
                 } catch (error) {
                     console.error('Error checking session:', error);

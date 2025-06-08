@@ -44,13 +44,27 @@ export async function loadProperties() {
                 <td>${formatDate(property.updatedAt)}</td>
                 <td><span class="status-badge ${property.status === 'פעיל' ? 'active' : 'draft'}">${property.status}</span></td>
                 <td>
-                    <button class="btn-edit" onclick="editProperty('${property.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" onclick="deleteProperty('${property.id}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn-edit" data-id="${property.id}"><i class="fas fa-edit"></i></button>
+                    <button class="btn-delete" data-id="${property.id}"><i class="fas fa-trash"></i></button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
         
+        // הוספת מאזיני אירועים לכפתורים
+        document.querySelectorAll('.btn-edit').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                editProperty(id);
+            });
+        });
+        
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                deleteProperty(id);
+            });
+        });
     } catch (error) {
         console.error('שגיאה בטעינת נכסים:', error);
         showError('אירעה שגיאה בטעינת הנכסים');
@@ -98,7 +112,7 @@ export function setupPropertyForm() {
 // פונקציה לעריכת נכס
 export async function editProperty(id) {
     try {
-        const response = await fetch(`../api/properties/${id}`);
+        const response = await fetch(`/api/properties/${id}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -153,7 +167,7 @@ export async function deleteProperty(id) {
     }
     
     try {
-        const response = await fetch(`../api/properties/${id}`, {
+        const response = await fetch(`/api/properties/${id}`, {
             method: 'DELETE'
         });
         
@@ -180,20 +194,35 @@ function updateImagePreviews(property) {
     if (mainImagePreview && property.mainImage) {
         mainImagePreview.innerHTML = `
             <img src="${property.mainImage}" alt="תמונה ראשית">
-            <button type="button" class="remove-image" onclick="removeMainImage()">
+            <button type="button" class="remove-image" data-type="main">
                 <i class="fas fa-times"></i>
             </button>
         `;
+        
+        // הוספת מאזין אירוע לכפתור הסרת תמונה ראשית
+        const removeMainBtn = mainImagePreview.querySelector('.remove-image');
+        if (removeMainBtn) {
+            removeMainBtn.addEventListener('click', removeMainImage);
+        }
     }
     
     if (additionalImagesPreview && property.images) {
         additionalImagesPreview.innerHTML = property.images.map((image, index) => `
             <div class="image-preview-item">
                 <img src="${image}" alt="תמונה ${index + 1}">
-                <button type="button" class="remove-image" onclick="removeAdditionalImage(${index})">
+                <button type="button" class="remove-image" data-index="${index}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         `).join('');
+        
+        // הוספת מאזיני אירועים לכפתורי הסרת תמונות נוספות
+        const removeButtons = additionalImagesPreview.querySelectorAll('.remove-image');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                removeAdditionalImage(index);
+            });
+        });
     }
 } 

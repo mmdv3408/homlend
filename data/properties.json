@@ -1,15 +1,13 @@
 [
   {
     "id": "3",
-    "title": "חזון איש ",
+    "title": "חזון איש 2עח",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
     "formattedPrice": "₪4,500",
     "type": "השכרה",
-    "images": [
-      "/uploads/images-1749067364713-316846165.png"
-    ],
+    "images": [],
     "rooms": "3",
     "area": "8484",
     "floor": "2",
@@ -21,7 +19,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-08T17:02:34.335Z",
+    "updatedAt": "2025-06-08T19:57:33.089Z",
     "additionalImages": "[\"/uploads/images-1749067362322-30271056.png\"]",
     "image": "/uploads/image-1748558903850-515840714.jpg",
     "keepExistingImages": "true",

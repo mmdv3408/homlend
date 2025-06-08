@@ -118,34 +118,35 @@ function addPropertyEventListeners() {
         btn.addEventListener('click', function() {
             const propertyId = this.getAttribute('data-id');
             
+            console.log('עריכת נכס:', propertyId);
+            
             // שינוי לתצוגת עריכה
             currentPropertyId = propertyId;
             
-            // מעבר ללשונית עריכה
-            document.querySelector('[data-section="add-property"]').click();
-            
-            // עדכון כותרת
-            const adminTitle = document.querySelector('.admin-title h1');
-            if (adminTitle) {
-                adminTitle.textContent = 'עריכת נכס';
-            }
-            
-            // עדכון כותרת טופס
-            const formTitle = document.querySelector('#property-form-title');
-            if (formTitle) {
-                formTitle.textContent = 'עריכת נכס קיים';
-            }
-            
-            // טעינת נתוני הנכס
+            // טעינת נתוני הנכס לפני מעבר לטאב העריכה
             fetch(`/api/properties/${propertyId}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('שגיאה בטעינת נתוני נכס');
+                        throw new Error(`קוד שגיאה: ${response.status}`);
                     }
                     return response.json();
                 })
-                .then(property => {
-                    fillPropertyForm(property);
+                .then(data => {
+                    if (data.success && data.property) {
+                        // מעבר ללשונית עריכה רק אחרי שקיבלנו את הנתונים
+                        document.querySelector('[data-section="add-property"]').click();
+                        
+                        // קצת השהייה כדי לוודא שהטופס מוצג
+                        setTimeout(() => {
+                            console.log('ממלא טופס עם נתונים:', data.property);
+                            document.getElementById('property-id').value = data.property.id || '';
+                            
+                            // מילוי הטופס עם הנתונים
+                            fillPropertyForm(data.property);
+                        }, 100);
+                    } else {
+                        throw new Error(data.error || 'לא ניתן לטעון את נתוני הנכס');
+                    }
                 })
                 .catch(error => {
                     console.error('שגיאה בטעינת נתוני נכס:', error);
@@ -209,9 +210,13 @@ function handlePropertyFormSubmit(e) {
     let url = '/api/properties';
     
     // אם זו עריכה, שנה את המתודה והכתובת
-    if (currentPropertyId) {
+    const propertyId = document.getElementById('property-id').value || currentPropertyId;
+    if (propertyId) {
         method = 'PUT';
-        url = `/api/properties/${currentPropertyId}`;
+        url = `/api/properties/${propertyId}`;
+        console.log(`עריכת נכס קיים: ${propertyId}`);
+    } else {
+        console.log('יצירת נכס חדש');
     }
     
     // שליחת הבקשה לשרת (הרחבה של הטיפול בתמונות נמצאת במודול admin-images.js)
@@ -251,43 +256,65 @@ function handlePropertyFormSubmit(e) {
 function fillPropertyForm(property) {
     console.log('ממלא טופס נכס עם נתונים:', property);
     
+    if (!property) {
+        console.error('לא ניתן למלא טופס עם נתוני נכס לא מוגדרים');
+        return;
+    }
+    
     // איפוס הטופס לפני מילוי
     resetPropertyForm();
     
     // עדכון המזהה הנוכחי
     currentPropertyId = property.id;
+    document.getElementById('property-id').value = property.id || '';
+    
+    // בדיקה ומילוי של כל שדה עם בדיקת קיום
+    const fillField = (id, value) => {
+        const field = document.getElementById(id);
+        if (field && value !== undefined) {
+            field.value = value || '';
+        }
+    };
     
     // מילוי שדות הטופס
-    document.getElementById('property-title').value = property.title || '';
-    document.getElementById('property-description').value = property.description || '';
-    document.getElementById('property-price').value = property.price || '';
-    document.getElementById('property-rooms').value = property.rooms || '';
-    document.getElementById('property-size').value = property.size || '';
-    document.getElementById('property-floor').value = property.floor || '';
-    document.getElementById('property-address').value = property.address || '';
-    document.getElementById('property-city').value = property.city || '';
-    document.getElementById('property-neighborhood').value = property.neighborhood || '';
+    fillField('property-title', property.title);
+    fillField('property-description', property.description);
+    fillField('property-price', property.price);
+    fillField('property-rooms', property.rooms);
+    fillField('property-area', property.area || property.size); // התאמה לשם השדה ב-HTML
+    fillField('property-floor', property.floor);
+    fillField('property-address', property.address);
+    fillField('property-neighborhood', property.neighborhood);
     
     // בחירת סוג עסקה
     if (property.dealType) {
-        document.querySelector(`input[name="dealType"][value="${property.dealType}"]`).checked = true;
+        const dealTypeRadio = document.querySelector(`input[name="dealType"][value="${property.dealType}"]`);
+        if (dealTypeRadio) {
+            dealTypeRadio.checked = true;
+        }
     }
     
     // בחירת סוג נכס
-    if (property.type) {
-        document.getElementById('property-type').value = property.type;
-    }
+    fillField('property-type', property.type);
     
     // בחירת מאפיינים
     if (property.features && Array.isArray(property.features)) {
         property.features.forEach(feature => {
-            const checkbox = document.querySelector(`input[name="features"][value="${feature}"]`);
+            const checkbox = document.querySelector(`input[name="features[]"][value="${feature}"]`);
             if (checkbox) checkbox.checked = true;
         });
     }
     
     // עדכון תצוגה מקדימה של תמונות
-    updateImagePreviews(property);
+    try {
+        if (typeof updateImagePreviews === 'function') {
+            updateImagePreviews(property);
+        } else {
+            console.warn('פונקציית updateImagePreviews לא נמצאה');
+        }
+    } catch (error) {
+        console.error('שגיאה בהצגת תמונות:', error);
+    }
     
     // עדכון כותרת הטופס
     const formTitle = document.querySelector('#property-form-title');

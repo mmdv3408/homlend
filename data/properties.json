@@ -1,7 +1,7 @@
 [
   {
     "id": "3",
-    "title": "חזון איש 1",
+    "title": "חזון איש ",
     "address": "בבב",
     "description": "בבב",
     "price": "גגג",
@@ -21,7 +21,7 @@
     "property_images[]": {},
     "agentName": "מנהל המערכת",
     "featured": "false",
-    "updatedAt": "2025-06-04T20:24:26.381Z",
+    "updatedAt": "2025-06-08T17:02:34.335Z",
     "additionalImages": "[\"/uploads/images-1749067362322-30271056.png\"]",
     "image": "/uploads/image-1748558903850-515840714.jpg",
     "keepExistingImages": "true",

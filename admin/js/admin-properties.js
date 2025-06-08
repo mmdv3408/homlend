@@ -22,7 +22,7 @@ export async function initProperties() {
 // פונקציה לטעינת נכסים
 export async function loadProperties() {
     try {
-        const response = await fetch('../api/properties');
+        const response = await fetch('/api/properties');
         const data = await response.json();
         
         if (!data.success) {
@@ -73,7 +73,7 @@ export function setupPropertyForm() {
             const formData = new FormData(form);
             const propertyId = formData.get('id');
             
-            const response = await fetch(`../api/properties${propertyId ? `/${propertyId}` : ''}`, {
+            const response = await fetch(`/api/properties${propertyId ? `/${propertyId}` : ''}`, {
                 method: propertyId ? 'PUT' : 'POST',
                 body: formData
             });

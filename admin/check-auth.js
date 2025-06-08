@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (!data.authenticated) {
                 // המשתמש לא מחובר - הפניה לדף התחברות
-                window.location.href = '/admin/login.html';
+                window.location.href = './login.html';
             } else {
                 // המשתמש מחובר
                 console.log('משתמש מחובר:', data.user);
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             // שגיאה בבדיקת הסשן
             console.error('שגיאה בבדיקת סטטוס התחברות:', error);
-            window.location.href = '/admin/login.html';
+            window.location.href = './login.html';
         });
 });
 

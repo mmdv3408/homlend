@@ -7,13 +7,13 @@ async function checkLoggedInUser() {
   const usernameElement = document.getElementById('username');
   if (!usernameElement) {
     console.log('1.1 No username element found - redirecting to login');
-    window.location.href = '../login.html';
+    window.location.href = './login.html';
     return false; // אין להמשיך בלי אימות
   }
   
   try {
     console.log('בודק סשן משתמש...');
-    const response = await fetch('../api/auth/check-session', {
+    const response = await fetch('/api/auth/check-session', {
       credentials: 'include'
     });
     
@@ -32,7 +32,7 @@ async function checkLoggedInUser() {
   } catch (error) {
     console.error('שגיאת אימות:', error);
     // הפנייה לדף ההתחברות
-    window.location.href = '../login.html';
+    window.location.href = './login.html';
     return false; // לא נמשיך את ההתחברות
   }
 }
@@ -46,7 +46,7 @@ async function initAuth() {
     
     if (!isAuthenticated) {
       console.log('2.2 User not authenticated, redirecting to login...');
-      window.location.href = '../login.html';
+      window.location.href = './login.html';
       return false;
     }
     
@@ -57,7 +57,7 @@ async function initAuth() {
   } catch (error) {
     console.error('2.4 Error in initAuth:', error);
     console.log('2.5 Redirecting to login page due to error...');
-    window.location.href = '../login.html';
+    window.location.href = './login.html';
     return false;
   }
 }
@@ -71,7 +71,7 @@ function setupLogoutButton() {
     logoutBtn.addEventListener('click', async () => {
       console.log('Logging out...');
       try {
-        const response = await fetch('../api/auth/logout', {
+        const response = await fetch('/api/auth/logout', {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -84,7 +84,7 @@ function setupLogoutButton() {
         
         if (data.success) {
           console.log('Logout successful, redirecting to login page');
-          window.location.href = '../login.html';
+          window.location.href = './login.html';
         } else {
           console.error('Logout failed:', data.message);
           alert('שגיאה בהתנתקות: ' + data.message);
@@ -97,7 +97,7 @@ function setupLogoutButton() {
         document.cookie = 'name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         
         alert('שגיאה בהתנתקות. מנתק אותך בכל זאת...');
-        window.location.href = '../login.html';
+        window.location.href = './login.html';
       }
     });
   } else {

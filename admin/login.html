@@ -264,8 +264,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
-            const errorMessage = document.getElementById('error-message');
-            const successMessage = document.getElementById('success-message');
+            const loginMessage = document.getElementById('loginMessage');
             const loginButton = document.querySelector('button[type="submit"]');
             const originalButtonText = loginButton.innerHTML;
             
@@ -273,7 +272,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const errorParam = urlParams.get('error');
             const loggedOut = urlParams.get('logged_out');
-            const returnTo = urlParams.get('returnTo') || '/admin';
+            const returnTo = urlParams.get('returnTo') || './';
             
             // Display appropriate messages based on URL parameters
             if (errorParam) {
@@ -330,8 +329,8 @@
                 const password = document.getElementById('password').value;
                 
                 // Reset messages
-                errorMessage.style.display = 'none';
-                successMessage.style.display = 'none';
+                loginMessage.style.display = 'none';
+                loginMessage.classList.remove('error', 'success');
                 
                 // Basic validation
                 if (!username || !password) {
@@ -402,21 +401,23 @@
             passwordInput.parentNode.insertBefore(togglePassword, passwordInput.nextSibling);
             
             function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
-                successMessage.style.display = 'none';
+                loginMessage.textContent = message;
+                loginMessage.style.display = 'block';
+                loginMessage.classList.add('error');
+                loginMessage.classList.remove('success');
                 
                 // Add animation
-                errorMessage.style.animation = 'shake 0.5s';
+                loginMessage.style.animation = 'shake 0.5s';
                 setTimeout(() => {
-                    errorMessage.style.animation = '';
+                    loginMessage.style.animation = '';
                 }, 500);
             }
             
             function showSuccess(message) {
-                successMessage.textContent = message;
-                successMessage.style.display = 'block';
-                errorMessage.style.display = 'none';
+                loginMessage.textContent = message;
+                loginMessage.style.display = 'block';
+                loginMessage.classList.add('success');
+                loginMessage.classList.remove('error');
             }
         });
         

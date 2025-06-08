@@ -759,6 +759,51 @@ app.post('/api/auth/logout', (req, res) => {
   });
 });
 
+// נקודת קצה לסטטיסטיקות לוח הבקרה
+app.get('/api/dashboard/stats', (req, res) => {
+  // בדיקת הרשאות
+  if (!req.cookies || !req.cookies.adminAuth) {
+    return res.status(401).json({
+      success: false,
+      message: 'לא מורשה - הזדהות נדרשת'
+    });
+  }
+  
+  // במצב אמיתי כאן יהיו נתונים אמיתיים מהדאטהבייס
+  // כרגע אנחנו מחזירים נתונים לדוגמא
+  res.json({
+    success: true,
+    stats: {
+      properties: 12,
+      views: 458,
+      inquiries: 27
+    }
+  });
+});
+
+// נקודת קצה לפעילויות אחרונות בלוח הבקרה
+app.get('/api/dashboard/activity', (req, res) => {
+  // בדיקת הרשאות
+  if (!req.cookies || !req.cookies.adminAuth) {
+    return res.status(401).json({
+      success: false,
+      message: 'לא מורשה - הזדהות נדרשת'
+    });
+  }
+  
+  // נתונים לדוגמא
+  res.json({
+    success: true,
+    activities: [
+      { time: new Date(Date.now() - 25 * 60000), text: 'נכס חדש נוסף: דירת 4 חדרים בתל אביב' },
+      { time: new Date(Date.now() - 120 * 60000), text: 'עדכון מחיר נכס: פנטהאוז ברחוב הירקון' },
+      { time: new Date(Date.now() - 5 * 3600000), text: '10 צפיות חדשות בנכס: דירת גן ברמת השרון' },
+      { time: new Date(Date.now() - 8 * 3600000), text: 'פנייה חדשה לנכס: דירת 3 חדרים בירושלים' },
+      { time: new Date(Date.now() - 26 * 3600000), text: 'סוכן חדש נרשם במערכת: אלמוג כהן' }
+    ]
+  });
+});
+
 // האזנה לפורט
 // נקודת קצה להעלאת תמונות
 app.post('/api/upload-images', upload.array('images', 10), (req, res) => {

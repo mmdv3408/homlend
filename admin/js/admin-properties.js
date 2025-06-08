@@ -1,10 +1,28 @@
 // ניהול נכסים
 import { showError, showSuccess, formatPrice, formatDate } from './utils.js';
 
+// פונקציה לאתחול מודול הנכסים
+export async function initProperties() {
+    console.log('אתחול מודול הנכסים...');
+    try {
+        // הגדרת טופס נכס
+        setupPropertyForm();
+        
+        // טעינת רשימת נכסים
+        await loadProperties();
+        
+        console.log('מודול הנכסים אותחל בהצלחה');
+        return true;
+    } catch (error) {
+        console.error('שגיאה באתחול מודול הנכסים:', error);
+        return false;
+    }
+}
+
 // פונקציה לטעינת נכסים
 export async function loadProperties() {
     try {
-        const response = await fetch('/api/properties');
+        const response = await fetch('../api/properties');
         const data = await response.json();
         
         if (!data.success) {
@@ -55,7 +73,7 @@ export function setupPropertyForm() {
             const formData = new FormData(form);
             const propertyId = formData.get('id');
             
-            const response = await fetch(`/api/properties${propertyId ? `/${propertyId}` : ''}`, {
+            const response = await fetch(`../api/properties${propertyId ? `/${propertyId}` : ''}`, {
                 method: propertyId ? 'PUT' : 'POST',
                 body: formData
             });
@@ -80,7 +98,7 @@ export function setupPropertyForm() {
 // פונקציה לעריכת נכס
 export async function editProperty(id) {
     try {
-        const response = await fetch(`/api/properties/${id}`);
+        const response = await fetch(`../api/properties/${id}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -135,7 +153,7 @@ export async function deleteProperty(id) {
     }
     
     try {
-        const response = await fetch(`/api/properties/${id}`, {
+        const response = await fetch(`../api/properties/${id}`, {
             method: 'DELETE'
         });
         

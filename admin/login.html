@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>התחברות - הום-לנד נכסים</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -261,9 +261,7 @@
         <div class="spinner"></div>
     </div>
 
-    <script type="module">
-        import { API_URL } from './js/config.js';
-        
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
             const errorMessage = document.getElementById('error-message');
@@ -296,7 +294,7 @@
             // Check if user is already logged in
             async function checkSession() {
                 try {
-                    const response = await fetch(`${API_URL}/api/auth/check-session`, {
+                    const response = await fetch('/api/auth/check-session', {
                         method: 'GET',
                         credentials: 'include',
                         headers: {
@@ -347,7 +345,7 @@
                 loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מתחבר...';
                 
                 try {
-                    const response = await fetch(`${API_URL}/api/auth/login`, {
+                    const response = await fetch('/api/auth/login', {
                         method: 'POST',
                         credentials: 'include',
                         headers: {
@@ -368,7 +366,7 @@
                         showSuccess('מתחבר...');
                         // Small delay to show success message before redirect
                         setTimeout(() => {
-                            window.location.href = data.redirect || decodeURIComponent(returnTo);
+                            window.location.href = data.redirect || './index.html';
                         }, 500);
                     } else {
                         // Focus on password field on error

@@ -5,35 +5,48 @@
 
 import { getCookie, showError, showSuccess } from './admin-utils.js';
 
-// פונקציית בדיקת הרשאות - בלי הפניה אוטומטית למניעת לולאות אינסופיות
+// פונקציית בדיקת הרשאות - דורשת אימות מלא עם סיסמה
 function checkAuth() {
-    console.log('בודק מצב אימות משתמש...');
-    
-    // בדוק אם יש כבר הפניה בתהליך למניעת לולאת אינסוף
-    const redirectInProgress = sessionStorage.getItem('auth_redirect_in_progress');
-    if (redirectInProgress === 'true') {
-        console.log('זוהתה הפניית אימות בתהליך, מונע לולאת הפניות');
-        sessionStorage.removeItem('auth_redirect_in_progress');
-        return Promise.resolve(false);
-    }
-    
-    return fetch('/api/auth/status')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('בעיית תקשורת עם השרת');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('תוצאת בדיקת אימות:', data);
-            // מחזיר את מצב האימות בלבד, בלי לבצע הפניה
-            return data.authenticated === true;
-        })
-        .catch(error => {
-            console.error('שגיאה בבדיקת אימות:', error);
-            // לא מבצע הפניה אוטומטית גם במקרה של שגיאה
+    console.log('מבצע בדיקת אימות משתמש...');
+
+    // שליחת בקשה לבדיקת מצב האימות
+    return fetch('/api/auth/status', { 
+        method: 'GET',
+        credentials: 'include', // להבטיח שעוגיות נשלחות
+        headers: {
+            'Cache-Control': 'no-cache, no-store'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('בעיית תקשורת עם השרת');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('תוצאת אימות:', data);
+        
+        if (!data.authenticated) {
+            console.warn('משתמש לא מאומת! מפנה לדף התחברות');
+            // הפנייה מיידית לדף הלוגין
+            window.location.href = 'login.html';
             return false;
-        });
+        }
+        
+        // עדכן את פרטי המשתמש בממשק
+        const currentAgent = document.getElementById('currentAgent');
+        if (currentAgent && data.name) {
+            currentAgent.textContent = `שלום, ${data.name}`;
+        }
+        
+        return true;
+    })
+    .catch(error => {
+        console.error('שגיאה בבדיקת הרשאות:', error);
+        // גם במקרה של שגיאה, מפנה לדף ההתחברות
+        window.location.href = 'login.html';
+        return false;
+    });
 }
 
 // פונקציית התנתקות

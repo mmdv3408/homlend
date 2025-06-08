@@ -3,138 +3,130 @@
  * מודול ראשי למערכת הניהול מפצל לפי תחומי אחריות
  */
 
-// ייבוא פונקציות ממודולים אחרים
-try {
-    // כלים וכלי עזר
-    import('./admin-utils.js')
-        .then(utils => {
-            window.showError = utils.showError;
-            window.showSuccess = utils.showSuccess;
-            window.getCookie = utils.getCookie;
-            window.formatPrice = utils.formatPrice;
-            window.formatDate = utils.formatDate;
-            console.log('נטענו הפונקציות מ- admin-utils.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-utils:', err);
-        });
+// ייבוא פונקציות ממודול האימות תחילה - חשוב לבדיקת ההרשאות
+import { checkAuth, logout, initAuth } from './admin-auth.js';
+import { getCookie, showError, showSuccess, formatPrice, formatDate } from './admin-utils.js';
 
-    // כלי אימות
-    import('./admin-auth.js')
-        .then(auth => {
-            window.checkAuth = auth.checkAuth;
-            window.logout = auth.logout;
-            window.initAuth = auth.initAuth;
-            console.log('נטענו הפונקציות מ- admin-auth.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-auth:', err);
+// בדיקת הרשאות ישירה מיד בתחילת הקובץ
+checkAuth().then(isAuthenticated => {
+    if (isAuthenticated) {
+        // רק אם המשתמש מאומת, ממשיכים לטעון את המודולים
+        loadModules();
+        
+        // אתחול המערכת
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('הדף נטען בהצלחה, המשתמש מאומת');
+            initAdmin();
         });
+    } else {
+        // אם המשתמש לא מאומת, בדרך כלל הוא יופנה אוטומטית לדף לוגין
+        console.error('משתמש לא מאומת!');
+    }
+}).catch(err => {
+    console.error('שגיאה בבדיקת הרשאות:', err);
+});
 
-    // דשבורד
-    import('./admin-dashboard.js')
-        .then(dashboard => {
-            window.loadDashboardData = dashboard.loadDashboardData;
-            console.log('נטענו הפונקציות מ- admin-dashboard.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-dashboard:', err);
-        });
-
-    // נכסים
-    import('./admin-properties.js')
-        .then(props => {
-            window.loadProperties = props.loadProperties;
-            window.setupPropertyForm = props.setupPropertyForm;
-            window.addPropertyEventListeners = props.addPropertyEventListeners;
-            console.log('נטענו הפונקציות מ- admin-properties.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-properties:', err);
-        });
-
-    // סוכנים
-    import('./admin-agents.js')
-        .then(agents => {
-            window.loadAgents = agents.loadAgents;
-            window.addAgentEventListeners = agents.addAgentEventListeners;
-            console.log('נטענו הפונקציות מ- admin-agents.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-agents:', err);
-        });
-
-    // תמונות
-    import('./admin-images.js')
-        .then(images => {
-            window.setupImageUploadPreview = images.setupImageUploadPreview;
-            console.log('נטענו הפונקציות מ- admin-images.js');
-        })
-        .catch(err => {
-            console.error('שגיאה בטעינת מודול admin-images:', err);
-        });
-
-} catch (err) {
-    console.error('שגיאה כללית בטעינת המודולים:', err);
+// פונקציה לטעינת מודולים נוספים לאחר אימות
+async function loadModules() {
+    console.log('מתחיל טעינת מודולים...');
+    
+    try {
+        // טעינת דשבורד
+        const dashboardModule = await import('./admin-dashboard.js');
+        window.loadDashboardData = dashboardModule.loadDashboardData;
+        console.log('נטען מודול הדשבורד');
+        
+        // טעינת נכסים
+        const propertiesModule = await import('./admin-properties.js');
+        window.loadProperties = propertiesModule.loadProperties;
+        window.setupPropertyForm = propertiesModule.setupPropertyForm;
+        window.addPropertyEventListeners = propertiesModule.addPropertyEventListeners;
+        console.log('נטען מודול הנכסים');
+        
+        // טעינת סוכנים
+        const agentsModule = await import('./admin-agents.js');
+        window.loadAgents = agentsModule.loadAgents;
+        window.addAgentEventListeners = agentsModule.addAgentEventListeners;
+        console.log('נטען מודול הסוכנים');
+        
+        // טעינת תמונות
+        const imagesModule = await import('./admin-images.js');
+        window.setupImageUploadPreview = imagesModule.setupImageUploadPreview;
+        console.log('נטען מודול התמונות');
+        
+        console.log('כל המודולים נטענו בהצלחה!');
+        
+        // רק לאחר שכל המודולים נטענו, ניתן לאתחל את הממשק
+        return true;
+    } catch (error) {
+        console.error('שגיאה בטעינת המודולים:', error);
+        return false;
+    }
 }
 
 // משתנה גלובלי למעקב אחר המקטע הנוכחי
 let currentSection = null;
 
 // פונקציה לאתחול מערכת הניהול
-function initAdmin() {
-    console.log('%cמאתחל מערכת ניהול', 'color: blue; font-weight: bold');
+async function initAdmin() {
+    console.log('מאתחל מערכת ניהול');
     
-    // מוסיף listener לאירוע טעינת הדף
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('הדף נטען בשלמותו, מתחיל בדיקת אימות');
-    
-        try {
-            // בדיקת הרשאות משתמש
-            checkAuth()
-                .then(isAuthenticated => {
-                    console.log(`%cתוצאת אימות: ${isAuthenticated ? 'משתמש מאומת' : 'משתמש לא מאומת'}`, 'color: green; font-weight: bold');
-                    
-                    if (isAuthenticated) {
-                        // אתחול הניווט בין מקטעים
-                        initSectionNav();
-                        
-                        // טעינת מקטע ראשוני (לוח בקרה)
-                        showSection('dashboard');
-                        
-                        // אתחול הטפסים וההגדרות
-                        setupForms();
-                        
-                        // אתחול אירועים כלליים
-                        setupEvents();
-                    } else {
-                        console.warn('משתמש לא מאומת, מפנה לדף התחברות');
-                        window.location.href = 'login.html';
-                    }
-                })
-                .catch(error => {
-                    console.error('%cשגיאה באימות:', 'color: red; font-weight: bold', error);
-                    // במקרה של שגיאה, מפנה לדף ההתחברות
-                    window.location.href = 'login.html?error_source=admin';
-                });
-        } catch (error) {
-            console.error('%cשגיאה באתחול מערכת הניהול:', 'color: red; font-weight: bold', error);
-            window.location.href = 'login.html?error_source=init';
+    try {
+        // בדיקת הרשאות משתמש
+        const isAuthenticated = await initAuth();
+        
+        if (isAuthenticated) {
+            console.log('משתמש מאומת, טוען מודולים...');
+            
+            // טעינת כל המודולים הדרושים
+            const modulesLoaded = await loadModules();
+            
+            if (modulesLoaded) {
+                console.log('המודולים נטענו, מאתחל ממשק...');
+                
+                // אתחול הטפסים וההגדרות
+                setupForms();
+                
+                // אתחול אירועים כלליים
+                setupEvents();
+                
+                // אתחול הניווט בין מקטעים
+                initSectionNav();
+                
+                // הגדרת דשבורד כמקטע ברירת מחדל
+                const dashboardItem = document.querySelector('.admin-menu li[data-section="dashboard"]');
+                if (dashboardItem) {
+                    dashboardItem.classList.add('active');
+                }
+                
+                // טעינת מקטע ראשוני (לוח בקרה)
+                showSection('dashboard');
+            } else {
+                showError('לא ניתן היה לטעון את כל המודולים הדרושים');
+            }
         }
-    });
+    } catch (error) {
+        console.error('שגיאה באתחול מערכת הניהול:', error);
+    }
 }
 
 // פונקציה לאתחול ניווט בין מקטעים
 function initSectionNav() {
-    document.querySelectorAll('.nav-item').forEach(item => {
+    console.log('מאתחל מערכת ניווט בין מקטעים...');
+    
+    // הסלקטור הנכון הוא עבור פריטי התפריט שהם אלמנטי li בתוך .admin-menu
+    document.querySelectorAll('.admin-menu li').forEach(item => {
+        console.log('נמצא פריט תפריט:', item.getAttribute('data-section'));
+        
         item.addEventListener('click', function(e) {
+            console.log('נלחץ פריט תפריט:', this.getAttribute('data-section'));
             e.preventDefault();
             
             // מניעת לחיצות מיותרות אם כבר נמצאים במקטע
             if (this.classList.contains('active')) return;
             
             // הסרת המצב פעיל מכל פריטי התפריט
-            document.querySelectorAll('.nav-item').forEach(navItem => {
+            document.querySelectorAll('.admin-menu li').forEach(navItem => {
                 navItem.classList.remove('active');
             });
             
@@ -145,15 +137,13 @@ function initSectionNav() {
             const section = this.getAttribute('data-section');
             if (section) {
                 showSection(section);
+            } else {
+                console.error('לא נמצא מזהה מקטע עבור הפריט', this);
             }
         });
     });
     
-    // הפעלת החלק הראשון בטעינה ראשונית
-    const firstLink = document.querySelector('.nav-item');
-    if (firstLink) {
-        firstLink.classList.add('active');
-    }
+    console.log('סיים אתחול מערכת ניווט');
 }
 
 // פונקציה להצגת מקטע לפי שם
@@ -163,22 +153,37 @@ function showSection(sectionName) {
     // מעקב אחר המקטע הנוכחי
     currentSection = sectionName;
     
+    // בדיקה שהמקטע מוגדר ב-HTML
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (!targetSection) {
+        console.error(`מקטע '${sectionName}' לא נמצא ב-HTML`);
+        return;
+    }
+    
+    // סימון הפריט המתאים בתפריט כפעיל
+    document.querySelectorAll('.admin-menu li').forEach(item => {
+        item.classList.remove('active');
+        
+        if (item.getAttribute('data-section') === sectionName) {
+            item.classList.add('active');
+        }
+    });
+    
     // הסתרת כל המקטעים
     document.querySelectorAll('.admin-section').forEach(section => {
         section.classList.remove('active');
     });
     
     // הצגת המקטע המבוקש
-    const targetSection = document.getElementById(`${sectionName}-section`);
-    if (targetSection) {
-        targetSection.classList.add('active');
-        
-        // עדכון כותרת הדף
-        updatePageTitle(sectionName);
-        
-        // טעינת נתונים בהתאם למקטע
+    targetSection.classList.add('active');
+    
+    // עדכון כותרת הדף
+    updatePageTitle(sectionName);
+    
+    // נסה לטעון את הנתונים עבור המקטע הזה 
+    setTimeout(() => {
         loadSectionData(sectionName);
-    }
+    }, 100); // השהיה קטנה לווידוא שהמודולים נטענו
 }
 
 // פונקציה לעדכון כותרת הדף לפי מקטע
@@ -212,21 +217,41 @@ function updatePageTitle(sectionName) {
 
 // פונקציה לטעינת נתונים בהתאם למקטע הנוכחי
 function loadSectionData(sectionName) {
+    console.log(`טוען נתונים עבור מקטע: ${sectionName}`);
+    
+    // בדיקה שהפונקציות אכן קיימות לפני קריאה אליהן
     switch(sectionName) {
         case 'dashboard':
-            loadDashboardData();
+            if (typeof window.loadDashboardData === 'function') {
+                window.loadDashboardData();
+            } else {
+                console.warn('פונקציית loadDashboardData אינה זמינה עדיין');
+            }
             break;
         case 'properties':
-            loadProperties();
-            break;
-        case 'add-property':
-            setupPropertyForm();
+            if (typeof window.loadProperties === 'function') {
+                window.loadProperties();
+            } else {
+                console.warn('פונקציית loadProperties אינה זמינה עדיין');
+            }
             break;
         case 'agents':
-            loadAgents();
+            if (typeof window.loadAgents === 'function') {
+                window.loadAgents();
+            } else {
+                console.warn('פונקציית loadAgents אינה זמינה עדיין');
+            }
             break;
-        // מקטעים נוספים אם יתווספו בעתיד
-    }
+        case 'add-property':
+            if (typeof window.setupPropertyForm === 'function') {
+                window.setupPropertyForm();
+            }
+            if (typeof window.setupImageUploadPreview === 'function') {
+                window.setupImageUploadPreview();
+            }
+            break;
+    }    
+    // מקטעים נוספים אם יתווספו בעתיד
 }
 
 // פונקציה לאתחול הטפסים והגדרות

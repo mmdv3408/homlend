@@ -145,5 +145,24 @@
       "uploads/additional_images-1748924815068-31920268.png"
     ],
     "updatedAt": "2025-06-03T16:06:05.256Z"
+  },
+  {
+    "id": "1748721556666",
+    "title": "האנ",
+    "address": "נ",
+    "description": "נ",
+    "price": "נ",
+    "formattedPrice": "₪נ",
+    "type": "מכירה",
+    "images": [],
+    "rooms": "1",
+    "area": "6",
+    "floor": "1",
+    "features": [],
+    "neighborhood": "נ",
+    "status": "פעיל",
+    "agentId": 1,
+    "createdAt": "2025-06-08T18:55:00.935Z",
+    "updatedAt": "2025-06-08T18:55:00.935Z"
   }
 ]

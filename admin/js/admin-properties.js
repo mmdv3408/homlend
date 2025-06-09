@@ -4,7 +4,7 @@
  */
 
 import { showError, showSuccess, formatPrice } from './admin-utils.js';
-import { updateImagePreviews } from './admin-images.js';
+import { updateImagePreviews, prepareImagesForSubmit } from './admin-images.js';
 
 // משתנים גלובליים למודול
 let propertiesData = [];
@@ -118,35 +118,58 @@ function addPropertyEventListeners() {
         btn.addEventListener('click', function() {
             const propertyId = this.getAttribute('data-id');
             
-            console.log('עריכת נכס:', propertyId);
+            console.log('לחיצה על כפתור עריכת נכס:', propertyId);
+            
+            if (!propertyId) {
+                showError('לא נמצא מזהה נכס לעריכה');
+                return;
+            }
             
             // שינוי לתצוגת עריכה
             currentPropertyId = propertyId;
             
-            // טעינת נתוני הנכס לפני מעבר לטאב העריכה
-            fetch(`/api/properties/${propertyId}`)
+            // עדכון הכותרות עוד לפני הטעינה
+            document.querySelector('[data-section="add-property"]').click();
+            
+            // עדכון כותרות
+            const adminTitle = document.querySelector('.admin-title h1');
+            if (adminTitle) {
+                adminTitle.textContent = 'עריכת נכס';
+            }
+            
+            const formTitle = document.querySelector('#property-form-title');
+            if (formTitle) {
+                formTitle.textContent = 'עריכת נכס קיים';
+            }
+            
+            // טעינת נתוני הנכס - שימוש בנתונים מהרשימה המלאה
+            console.log('טוען נתוני נכס מהשרת...');
+            
+            // טעינת כל הנכסים ואז מציאת הנכס הספציפי
+            fetch('/api/properties')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`קוד שגיאה: ${response.status}`);
+                        throw new Error(`שגיאה בטעינת נתונים: ${response.status}`);
                     }
                     return response.json();
                 })
-                .then(data => {
-                    if (data.success && data.property) {
-                        // מעבר ללשונית עריכה רק אחרי שקיבלנו את הנתונים
-                        document.querySelector('[data-section="add-property"]').click();
-                        
-                        // קצת השהייה כדי לוודא שהטופס מוצג
-                        setTimeout(() => {
-                            console.log('ממלא טופס עם נתונים:', data.property);
-                            document.getElementById('property-id').value = data.property.id || '';
-                            
-                            // מילוי הטופס עם הנתונים
-                            fillPropertyForm(data.property);
-                        }, 100);
-                    } else {
-                        throw new Error(data.error || 'לא ניתן לטעון את נתוני הנכס');
+                .then(properties => {
+                    console.log('כל הנכסים נטענו, מחפש נכס:', propertyId);
+                    
+                    // חיפוש הנכס עם ה-ID המבוקש
+                    const property = properties.find(p => p.id === propertyId || String(p.id) === String(propertyId));
+                    
+                    if (!property) {
+                        console.error(`לא נמצא נכס עם מזהה ${propertyId}`);
+                        showError(`לא נמצא נכס עם מזהה ${propertyId}`);
+                        return;
                     }
+                    
+                    console.log('נכס נמצא, מעדכן טופס:', property);
+                    document.getElementById('property-id').value = property.id || '';
+                    
+                    // מילוי הטופס עם הנתונים
+                    fillPropertyForm(property);
                 })
                 .catch(error => {
                     console.error('שגיאה בטעינת נתוני נכס:', error);
@@ -154,6 +177,7 @@ function addPropertyEventListeners() {
                 });
         });
     });
+                
     
     document.querySelectorAll('.delete-property-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -219,11 +243,11 @@ function handlePropertyFormSubmit(e) {
         console.log('יצירת נכס חדש');
     }
     
-    // שליחת הבקשה לשרת (הרחבה של הטיפול בתמונות נמצאת במודול admin-images.js)
-    fetch(url, {
-        method: method,
-        body: formData
-    })
+    // קודם נכין את התמונות להעלאה (פונקציה מהמודול admin-images.js)
+    console.log('מכין תמונות לשליחה...');
+    
+    // נרשום את הפעולה כך שהיא תחכה להכנת התמונות לפני שליחת הטופס
+    const form = this;
     .then(response => {
         console.log('תגובת שרת:', response.status);
         if (!response.ok) {
@@ -309,6 +333,14 @@ function fillPropertyForm(property) {
     try {
         if (typeof updateImagePreviews === 'function') {
             updateImagePreviews(property);
+            
+            // אחרי הצגת התמונות, נגדיר מחדש את האזנות לאירועים
+            console.log('הגדרת אזנות לתמונות לאחר מילוי הטופס');
+            if (typeof setupImageUploadPreview === 'function') {
+                setTimeout(() => {
+                    setupImageUploadPreview();
+                }, 100);
+            }
         } else {
             console.warn('פונקציית updateImagePreviews לא נמצאה');
         }

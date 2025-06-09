@@ -12,27 +12,45 @@ let uploadedImageUrls = [];
 function setupImageUploadPreview() {
     console.log('מגדיר תצוגה מקדימה של תמונות');
     
+    // נקה תחילה את כל האירועים הקיימים
+    resetImageInputEvents();
+    
     // תמונה ראשית
     const mainImageInput = document.getElementById('property-main-image');
     const mainPreview = document.getElementById('main-image-preview');
     
     if (mainImageInput && mainPreview) {
-        mainImageInput.addEventListener('change', function(e) {
+        console.log('מוסיף מאזין לתמונה ראשית:', mainImageInput);
+        
+        // קודם נסיר את כל המאזינים
+        const newMainInput = mainImageInput.cloneNode(true);
+        mainImageInput.parentNode.replaceChild(newMainInput, mainImageInput);
+        
+        // נוסיף את המאזין מחדש
+        newMainInput.addEventListener('change', function(e) {
+            console.log('נבחרה תמונה ראשית חדשה');
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
+                    console.log('תמונה ראשית נטענה:', e.target.result.substring(0, 50) + '...');
                     mainPreview.innerHTML = `
                         <div class="image-preview-item main-image">
-                            <img src="${e.target.result}" alt="תמונה ראשית">
+                            <img src="${e.target.result}" alt="תמונה ראשית" onerror="this.src='../images/placeholder.jpg';">
                             <div class="image-actions">
                                 <button type="button" class="remove-image" data-target="main"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                     `;
                     
+                    // הסרת שדה מוסתר לציון הסרת התמונה הראשית אם קיים
+                    const removeMainImageField = document.getElementById('remove-main-image');
+                    if (removeMainImageField) {
+                        removeMainImageField.remove();
+                    }
+                    
                     // אירוע לכפתור הסרת התמונה
-                    addRemoveImageListeners();
+                    setTimeout(addRemoveImageListeners, 50);
                 };
                 
                 reader.readAsDataURL(this.files[0]);
@@ -45,29 +63,48 @@ function setupImageUploadPreview() {
     const additionalPreview = document.getElementById('additional-images-preview');
     
     if (additionalImagesInput && additionalPreview) {
-        additionalImagesInput.addEventListener('change', function(e) {
-            if (this.files) {
+        console.log('מוסיף מאזין לתמונות נוספות:', additionalImagesInput);
+        
+        // קודם נסיר את כל המאזינים הקיימים
+        const newAdditionalInput = additionalImagesInput.cloneNode(true);
+        additionalImagesInput.parentNode.replaceChild(newAdditionalInput, additionalImagesInput);
+        
+        // נוסיף את המאזין מחדש לאחר ההחלפה
+        newAdditionalInput.addEventListener('change', function(e) {
+            console.log('נבחרו תמונות נוספות חדשות, מספר:', this.files ? this.files.length : 0);
+            
+            if (this.files && this.files.length > 0) {
+                // לא מנקים את התמונות הקיימות כדי לאפשר הוספה של תמונות חדשות
+                
                 Array.from(this.files).forEach(file => {
                     const reader = new FileReader();
                     
                     reader.onload = function(e) {
+                        console.log('תמונה נוספת נטענה:', e.target.result.substring(0, 50) + '...');
+                        
                         const imageItem = document.createElement('div');
                         imageItem.className = 'image-preview-item';
                         imageItem.innerHTML = `
-                            <img src="${e.target.result}" alt="תמונה נוספת">
+                            <img src="${e.target.result}" alt="תמונה נוספת" onerror="this.src='../images/placeholder.jpg';">
                             <div class="image-actions">
                                 <button type="button" class="remove-image" data-index="${Date.now()}"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         `;
                         
                         additionalPreview.appendChild(imageItem);
+                        
+                        // הוספת מאזיני אירועים לכפתור הסרת תמונה אחרי הוספת כל תמונה
+                        const removeBtn = imageItem.querySelector('.remove-image');
+                        if (removeBtn) {
+                            removeBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                imageItem.remove();
+                            });
+                        }
                     };
                     
                     reader.readAsDataURL(file);
                 });
-                
-                // אירוע לכפתור הסרת תמונות
-                setTimeout(addRemoveImageListeners, 100);
             }
         });
     }
@@ -83,40 +120,84 @@ function updateImagePreviews(property) {
     try {
         // עדכון תמונה ראשית
         const mainPreview = document.getElementById('main-image-preview');
-        if (mainPreview && property.mainImage) {
+        console.log('נתוני נכס:', property);
+        
+        // בדיקת כל השדות האפשריים לתמונה הראשית
+        const mainImageSrc = property.image || property.mainImage;
+        
+        console.log('תמונה ראשית שנמצאה:', mainImageSrc);
+        
+        if (mainPreview && mainImageSrc) {
+            console.log('מציג תמונה ראשית:', mainImageSrc);
             mainPreview.innerHTML = `
                 <div class="image-preview-item main-image">
-                    <img src="${property.mainImage}" alt="תמונה ראשית" onerror="this.src='../images/placeholder.jpg';">
+                    <img src="${mainImageSrc}" alt="תמונה ראשית" onerror="this.src='../images/placeholder.jpg';">
                     <div class="image-actions">
                         <button type="button" class="remove-image" data-target="main"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
             `;
         } else if (mainPreview) {
+            console.log('לא נמצאה תמונה ראשית');
             mainPreview.innerHTML = '<div class="no-image">לא נמצאה תמונה ראשית</div>';
         }
         
         // עדכון תמונות נוספות
         const additionalPreview = document.getElementById('additional-images-preview');
-        if (additionalPreview && property.additionalImages && Array.isArray(property.additionalImages)) {
+        
+        // בדיקת כל השדות האפשריים לתמונות נוספות
+        let additionalImagesArray = [];
+        
+        // בדיקה אם יש תמונות נוספות במערך
+        if (property.additionalImages && Array.isArray(property.additionalImages)) {
+            additionalImagesArray = property.additionalImages;
+        } 
+        // בדיקה אם יש תמונות נוספות במחרוזת JSON
+        else if (property.additionalImages && typeof property.additionalImages === 'string') {
+            try {
+                additionalImagesArray = JSON.parse(property.additionalImages);
+                console.log('פענוח מחרוזת JSON לתמונות נוספות:', additionalImagesArray);
+            } catch (error) {
+                console.error('שגיאה בפענוח מחרוזת JSON לתמונות:', error);
+            }
+        }
+        // בדיקה אם יש תמונות בשדה images
+        else if (property.images && Array.isArray(property.images)) {
+            additionalImagesArray = property.images;
+        } 
+        // בדיקה אם יש תמונות במחרוזת JSON בשדה images
+        else if (property.images && typeof property.images === 'string') {
+            try {
+                additionalImagesArray = JSON.parse(property.images);
+                console.log('פענוח מחרוזת JSON לתמונות:', additionalImagesArray);
+            } catch (error) {
+                console.error('שגיאה בפענוח מחרוזת JSON לתמונות:', error);
+            }
+        }
+        
+        // עדכון תצוגה מקדימה
+        if (additionalPreview) {
             additionalPreview.innerHTML = ''; // ניקוי תמונות קודמות
             
-            property.additionalImages.forEach((image, index) => {
-                if (!image) return;
+            // בדיקה אם יש תמונות להציג
+            if (Array.isArray(additionalImagesArray) && additionalImagesArray.length > 0) {
+                console.log('מציג תמונות נוספות:', additionalImagesArray);
                 
-                const imageItem = document.createElement('div');
-                imageItem.className = 'image-preview-item';
-                imageItem.innerHTML = `
-                    <img src="${image}" alt="תמונה נוספת ${index + 1}" onerror="this.src='../images/placeholder.jpg';">
-                    <div class="image-actions">
-                        <button type="button" class="remove-image" data-url="${image}"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-                
-                additionalPreview.appendChild(imageItem);
-            });
-        } else if (additionalPreview) {
-            additionalPreview.innerHTML = ''; // ניקוי תצוגה אם אין תמונות
+                additionalImagesArray.forEach((image, index) => {
+                    if (!image) return;
+                    
+                    const imageItem = document.createElement('div');
+                    imageItem.className = 'image-preview-item';
+                    imageItem.innerHTML = `
+                        <img src="${image}" alt="תמונה נוספת ${index + 1}" onerror="this.src='../images/placeholder.jpg';">
+                        <div class="image-actions">
+                            <button type="button" class="remove-image" data-url="${image}"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
+                    
+                    additionalPreview.appendChild(imageItem);
+                });
+            }
         }
         
         // הוספת אירועים לכפתורי הסרה
@@ -279,6 +360,39 @@ function resetImageState() {
     uploadedImageUrls = [];
 }
 
+// פונקציה לניקוי אירועים קיימים משדות הקלט של תמונות
+function resetImageInputEvents() {
+    console.log('מנקה אירועים קיימים משדות תמונה');
+    
+    // תמונה ראשית - הסרת מאזינים קיימים והחלפת הרכיב
+    const mainImageInput = document.getElementById('property-main-image');
+    if (mainImageInput) {
+        // יצירת רכיב חדש והחלפת הקיים כדי לנקות אירועים
+        const newMainInput = document.createElement('input');
+        newMainInput.type = 'file';
+        newMainInput.id = 'property-main-image';
+        newMainInput.name = 'mainImage'; // תיקון שם השדה
+        newMainInput.accept = 'image/*';
+        // וודא שאין תכונת multiple
+        
+        mainImageInput.parentNode.replaceChild(newMainInput, mainImageInput);
+    }
+    
+    // תמונות נוספות
+    const additionalImagesInput = document.getElementById('property-additional-images');
+    if (additionalImagesInput) {
+        // יצירת רכיב חדש והחלפת הקיים כדי לנקות אירועים
+        const newAdditionalInput = document.createElement('input');
+        newAdditionalInput.type = 'file';
+        newAdditionalInput.id = 'property-additional-images';
+        newAdditionalInput.name = 'additionalImages';
+        newAdditionalInput.accept = 'image/*';
+        newAdditionalInput.multiple = true; // רק כאן צריך להיות multiple
+        
+        additionalImagesInput.parentNode.replaceChild(newAdditionalInput, additionalImagesInput);
+    }
+}
+
 // יצוא פונקציות
 export {
     setupImageUploadPreview,
@@ -286,5 +400,6 @@ export {
     addRemoveImageListeners,
     uploadImages,
     prepareImagesForSubmit,
-    resetImageState
+    resetImageState,
+    resetImageInputEvents
 };

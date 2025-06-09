@@ -26,7 +26,7 @@
     "newImages": "[\"/uploads/images-1749065809397-987304696.jpg\"]"
   },
   {
-    "title": "דברי חיים 72",
+    "title": "דברי חיים ",
     "type": "מכירה",
     "price": "100,000,000 ש\"ח",
     "rooms": "6+",
@@ -37,12 +37,12 @@
     "description": " יעטעדק",
     "features": [],
     "status": "פעיל",
-    "featured": "true",
+    "featured": "false",
     "createdAt": "2025-06-01T07:27:50.436Z",
     "agentName": "מנהל המערכת",
     "id": "1748552463468",
     "image": "/uploads/image-1748557362718-94519037.jpg",
-    "updatedAt": "2025-06-04T20:23:55.166Z",
+    "updatedAt": "2025-06-09T16:43:09.470Z",
     "additionalImages": [
       "/uploads/additional_images-1748558482747-857553985.jpg"
     ],
@@ -51,7 +51,7 @@
     "newImages": "[\"/uploads/images-1749068635015-877047885.jpg\"]"
   },
   {
-    "title": "דירה בלב ירושלים ",
+    "title": "דירה בלב ירושלים 2",
     "type": "מכירה",
     "price": "4545",
     "rooms": "2",
@@ -66,20 +66,17 @@
       "מרפסת",
       "מיזוג",
       "מחסן",
-      "נגיש",
-      "[\"מעלית\",\"חניה\",\"מרפסת\",\"מיזוג\",\"מחסן\",\"נגיש\"]"
+      "נגיש"
     ],
     "status": "פעיל",
-    "featured": true,
+    "featured": "false",
     "createdAt": "2025-06-01T07:33:43.277Z",
     "agentName": "מנהל המערכת",
     "id": "1748552548350",
     "additionalImages": [],
-    "updatedAt": "2025-06-03T13:11:20.014Z",
+    "updatedAt": "2025-06-09T16:05:36.008Z",
     "image": "/uploads/image-1748560595854-745381426.png",
-    "images": [
-      "uploads/additional_images-1748924815068-31920268.png"
-    ]
+    "images": []
   },
   {
     "title": "פנטהאוז במרכז ירושלים  13",
@@ -97,11 +94,10 @@
       "מרפסת",
       "מיזוג",
       "מחסן",
-      "נגיש",
-      "[]"
+      "נגיש"
     ],
     "status": "פעיל",
-    "featured": "true",
+    "featured": "false",
     "createdAt": "2025-05-30T03:47:11.749Z",
     "agentName": "מנהל המערכת",
     "id": "1748569829105",
@@ -111,27 +107,23 @@
       "/uploads/additional_images-1748569829433-636871638.jpg"
     ],
     "image": "/uploads/image-1748569920855-598891655.jpg",
-    "updatedAt": "2025-06-04T16:20:50.517Z",
-    "images": []
+    "updatedAt": "2025-06-09T16:20:01.171Z",
+    "images": [
+      "/uploads/images-1749486001147-313456847.jpeg"
+    ]
   },
   {
-    "title": "מציאה שלא תחז",
+    "title": "בדיקה ",
     "type": "מכירה",
-    "price": "12252000 שח",
-    "rooms": "4",
-    "area": "2121212",
-    "floor": "4",
-    "neighborhood": "עיעארכע",
-    "address": "יוטואטו",
-    "description": "טאטא",
+    "price": "1,000,0000 שח",
+    "rooms": "2",
+    "area": "12",
+    "floor": "0",
+    "neighborhood": "רוממה",
+    "address": "תובל 12",
+    "description": "ס",
     "features": [
-      "מעלית",
-      "חניה",
-      "מרפסת",
-      "מיזוג",
-      "מחסן",
-      "נגיש",
-      "[]"
+      "מרפסת"
     ],
     "status": "פעיל",
     "featured": "false",
@@ -139,10 +131,8 @@
     "agentName": "מנהל המערכת",
     "id": "1748721556665",
     "image": "/uploads/image-1748721557468-237501509.jpg",
-    "images": [
-      "uploads/additional_images-1748924815068-31920268.png"
-    ],
-    "updatedAt": "2025-06-03T16:06:05.256Z"
+    "images": [],
+    "updatedAt": "2025-06-09T16:07:05.941Z"
   },
   {
     "id": "1748721556666",

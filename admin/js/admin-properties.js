@@ -223,12 +223,6 @@ function handlePropertyFormSubmit(e) {
     e.preventDefault();
     console.log('שליחת טופס נכס');
     
-    // יצירת אובייקט FormData חדש
-    const formData = new FormData(this);
-    
-    // הוספת מידע על תמונות מהטופס (ימולא על ידי מודול התמונות)
-    // קוד טיפול בתמונות נמצא במודול admin-images.js
-    
     // הגדרת שיטת השליחה וכתובת היעד
     let method = 'POST';
     let url = '/api/properties';
@@ -246,9 +240,21 @@ function handlePropertyFormSubmit(e) {
     // קודם נכין את התמונות להעלאה (פונקציה מהמודול admin-images.js)
     console.log('מכין תמונות לשליחה...');
     
-    // נרשום את הפעולה כך שהיא תחכה להכנת התמונות לפני שליחת הטופס
+    // נשתמש בפונקציית prepareImagesForSubmit לפני שליחת הטופס
     const form = this;
-    .then(response => {
+    prepareImagesForSubmit(form)
+        .then(() => {
+            console.log('התמונות הוכנו, שולח טופס...');
+            // יצירת FormData מעודכן לאחר הכנת התמונות
+            const updatedFormData = new FormData(form);
+            
+            // שליחת הבקשה לשרת
+            return fetch(url, {
+                method: method,
+                body: updatedFormData
+            });
+        })
+        .then(response => {
         console.log('תגובת שרת:', response.status);
         if (!response.ok) {
             throw new Error('שגיאה בתגובת השרת');
